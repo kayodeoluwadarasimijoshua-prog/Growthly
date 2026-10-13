@@ -6,6 +6,14 @@
 
 Vercel’s [Hobby documentation](https://vercel.com/docs/plans/hobby) limits that plan to non-commercial personal use. The owner must confirm an eligible plan for this commercial site. The [Pro documentation](https://vercel.com/docs/plans/pro-plan) lists a $20/month platform fee with one deploying seat and $20 usage credit, plus possible tax, usage and add-on charges. Confirm current billing/limits in the account before accepting costs. No plan was purchased or changed. Supabase/Resend costs depend on the selected plan, usage and region; no accounts were provisioned. Domain, hosting email and domain renewals remain separate owner expenses.
 
+## Actual preview deployment
+
+The branch push triggered the existing Vercel integration. GitHub reported **success / Preview** for commit `55db63149239f5b05a959ee49be4892707bc367e`:
+
+<https://growthly-7vztd7es0-joshuas-projects-94631af4.vercel.app>
+
+This deployment is protected by Vercel login. Public homepage/quote/robots fetches redirect to the login page, so remote runtime acceptance remains an owner/team task. No protection bypass attempted. The Arena Live Preview on port 3000 is the tested local production build. The production domain was re-fetched and still showed the previous homepage.
+
 ## Preview and promotion
 
 1. Import or retain `kayodeoluwadarasimijoshua-prog/Growthly` in the **existing** Vercel project. Use the Next.js preset, `npm ci`, `npm run build`, supported Node 22 and the normal `.next` output. No static export.

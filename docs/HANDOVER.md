@@ -69,15 +69,23 @@ Lab LCP/CLS meet the requested targets in this run. **Field INP was not measured
 
 **Completed and verified:** local production-server Arena Live Preview on **port 3000**. Open the conversation’s “Growthly website preview”. Browser tests use local access to that same build.
 
-**Hosting selected:** retain existing Vercel setup identified in GitHub deployment records. No DNS/nameserver/email changes, production promotion or subscription purchase made.
+**Completed and verified — Vercel Preview deployment:** the session branch was committed and pushed. GitHub’s Vercel status reports successful deployment for commit `55db63149239f5b05a959ee49be4892707bc367e`, environment **Preview**, deployment ID `7043579220`.
+
+Preview URL: <https://growthly-7vztd7es0-joshuas-projects-94631af4.vercel.app>
+
+**Implemented but remote runtime not yet verified:** homepage, quote page and robots fetches redirected to Vercel login (“Protected Deployment”). Owner/team login or an authorised shareable preview is required for remote acceptance tests. The successful hosting status is not evidence that remote lead delivery works. Use the tested Arena Live Preview meanwhile.
+
+**Hosting selected:** retain the existing Vercel setup. No DNS/nameserver/email changes, production promotion or subscription purchase made.
 
 **Production status:** the pre-existing `https://growthly.com.ng` responded to HTTPS content retrieval during audit. This revised build has **not been verified on the production domain**. Production publishing, current domain/certificate details and dashboard permissions require owner action.
 
 **Costs require approval:** Vercel Hobby is restricted to non-commercial personal use; owner must confirm an eligible commercial plan. Pro documentation lists $20/month platform fee with usage credit; taxes, extra usage/seats/add-ons may apply. No account plan or limits can be verified from GitHub records. Domain renewals, database/email plans and payment-provider fees for future client stores are separate. No paid services were purchased.
 
+Review pull request: <https://github.com/kayodeoluwadarasimijoshua-prog/Growthly/pull/2>. It is open, **not merged**. Do not merge/promote until production environment settings and acceptance checks are confirmed.
+
 ## 6. Outstanding work and next actions
 
-1. **Requires owner action:** review/publish the branch preview through the existing Vercel project; confirm commercial plan eligibility. Production promotion is not automatic handover acceptance.
+1. **Requires owner action:** log in and review the successful branch preview in the existing Vercel project; confirm commercial plan eligibility. Production promotion is not automatic handover acceptance.
 2. **Requires owner action:** approve public policies, retention, package defaults and final business details; test WhatsApp reception on a real phone.
 3. **Requires owner action:** optionally configure Supabase/Resend and verify end-to-end live delivery and private access; add host-level abuse protection for campaigns. Existing in-memory rate limits are not distributed.
 4. **Requires owner action:** set Production `SITE_INDEXING_ENABLED=true` before building, retain Preview `false`, confirm live routes/canonicals/HTTPS/redirects, then verify Google/Bing and submit sitemap.
