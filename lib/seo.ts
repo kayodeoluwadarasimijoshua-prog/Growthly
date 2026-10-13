@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { business } from "@/config/business";
 import { getSiteUrl } from "@/lib/site";
 
-export function pageMetadata(title: string, description: string, path: string): Metadata {
+export function pageMetadata(
+  title: string,
+  description: string,
+  path: string,
+): Metadata {
   const base = getSiteUrl();
   const canonical = base ? `${base}${path}` : undefined;
 

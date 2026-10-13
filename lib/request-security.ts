@@ -6,11 +6,20 @@ export function isSameOriginRequest(request: Request) {
   if (!origin) return false;
   try {
     const originUrl = new URL(origin);
-    const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+    const forwardedHost = request.headers
+      .get("x-forwarded-host")
+      ?.split(",")[0]
+      ?.trim();
     const requestHost = forwardedHost || request.headers.get("host");
-    if (requestHost && originUrl.host.toLowerCase() === requestHost.toLowerCase()) return true;
+    if (
+      requestHost &&
+      originUrl.host.toLowerCase() === requestHost.toLowerCase()
+    )
+      return true;
     const configuredSite = process.env.NEXT_PUBLIC_SITE_URL;
-    return Boolean(configuredSite && originUrl.origin === new URL(configuredSite).origin);
+    return Boolean(
+      configuredSite && originUrl.origin === new URL(configuredSite).origin,
+    );
   } catch {
     return false;
   }

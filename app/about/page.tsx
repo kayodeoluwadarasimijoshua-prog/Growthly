@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { ArrowRight, ClipboardCheck, Handshake, Lightbulb, ScanLine } from "lucide-react";
+import {
+  ArrowRight,
+  ClipboardCheck,
+  Handshake,
+  Lightbulb,
+  ScanLine,
+} from "lucide-react";
 import Link from "next/link";
 import { ClosingCTA } from "@/components/ClosingCTA";
 import { ProcessSteps } from "@/components/ProcessSteps";
@@ -45,12 +51,19 @@ export default function AboutPage() {
         <div className="container page-hero__grid">
           <div>
             <span className="eyebrow">About GROWTHLY</span>
-            <h1>Helping businesses scale up—with work that has a clear purpose.</h1>
-            <p>GROWTHLY brings design, web and marketing support together for businesses building their next stage.</p>
+            <h1>
+              Helping businesses scale up—with work that has a clear purpose.
+            </h1>
+            <p>
+              GROWTHLY brings design, web and marketing support together for
+              businesses building their next stage.
+            </p>
           </div>
           <div className="page-hero__aside">
             <strong>Our point of view</strong>
-            Digital work should make it easier for a real customer to understand a real offer. The right next step can be focused and practical; it doesn’t need to be the biggest project.
+            Digital work should make it easier for a real customer to understand
+            a real offer. The right next step can be focused and practical; it
+            doesn’t need to be the biggest project.
           </div>
         </div>
       </section>
@@ -62,17 +75,33 @@ export default function AboutPage() {
           </div>
           <div className="about-split__body">
             <p>
-              GROWTHLY supports small businesses, entrepreneurs and growing brands with the parts of their online presence that customers notice: the way an offer is presented, how a website guides a visitor and how a campaign shows up.
+              GROWTHLY supports small businesses, entrepreneurs and growing
+              brands with the parts of their online presence that customers
+              notice: the way an offer is presented, how a website guides a
+              visitor and how a campaign shows up.
             </p>
             <p>
-              The service list is broad because business needs vary. The process stays simple: understand the brief, agree a written scope, create the work and review it together before handover.
+              Website development is our primary focus, with design and
+              marketing support available for separately agreed needs. The
+              process stays simple: understand the brief, agree a written scope,
+              create the work and review it together before handover.
             </p>
             <div className="about-principles">
               {principles.map(({ icon: Icon, number, title, text }) => (
                 <article className="about-principle" key={number}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <span>{number} · GROWTHLY PRINCIPLE</span>
-                    <Icon size={16} aria-hidden="true" color="var(--green-dark)" />
+                    <Icon
+                      size={16}
+                      aria-hidden="true"
+                      color="var(--green-dark)"
+                    />
                   </div>
                   <h3>{title}</h3>
                   <p>{text}</p>
@@ -93,15 +122,27 @@ export default function AboutPage() {
         <div className="container">
           <div className="concept-note" role="note">
             <Lightbulb size={18} aria-hidden="true" />
-            <span>Our current portfolio uses original concept work because no commissioned project histories or testimonials were provided for publication. We’ll only add real client work with approval and accurate context.</span>
+            <span>
+              Our current portfolio showcases original, self-initiated website
+              concepts. We’ll only add real client work with approval and
+              accurate context.
+            </span>
           </div>
           <div style={{ marginTop: 30 }}>
-            <Link className="text-link" href="/work">See the concept portfolio <ArrowRight size={16} aria-hidden="true" /></Link>
+            <Link className="text-link" href="/portfolio">
+              See the concept portfolio{" "}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>
       <section className="section section--compact">
-        <div className="container"><ClosingCTA title="Start with the challenge you’re facing." description="Share what you need to make clearer or easier. We’ll talk through a suitable next step." /></div>
+        <div className="container">
+          <ClosingCTA
+            title="Start with the challenge you’re facing."
+            description="Share what you need to make clearer or easier. We’ll talk through a suitable next step."
+          />
+        </div>
       </section>
     </>
   );

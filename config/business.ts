@@ -2,7 +2,7 @@ export const business = {
   name: "GROWTHLY",
   tagline: "Helping Businesses Scale Up.",
   description:
-    "Practical design, websites and marketing support for Nigerian businesses ready to grow.",
+    "Professional website development for Nigerian businesses. Clear design, practical enquiry paths and a stronger online presence.",
   contact: {
     whatsapp: "08129391626",
     alternativePhone: "09162994183",
@@ -25,94 +25,62 @@ export type PackageDefinition = {
 };
 
 /**
- * These are the only published fixed-price packages. They apply to portfolio
- * websites for graphic designers, not to every GROWTHLY service.
+ * Quotation-based website solutions. No final prices or page counts are approved.
  * Update this file when scope, availability or pricing changes.
  */
-export const portfolioPackages: PackageDefinition[] = [
+export const websitePackages: PackageDefinition[] = [
   {
-    id: "starter-portfolio",
-    name: "Starter Portfolio",
-    price: "₦50,000",
-    priceValue: 50000,
-    availability: "Availability and start date confirmed after the brief.",
-    positioning: "A focused first home on the web for an independent designer.",
-    includes: [
-      "A tailored, single-page portfolio layout",
-      "About, selected work, services and contact sections",
-      "A gallery for up to 6 supplied projects",
-      "Responsive design for mobile and desktop",
-      "Basic page title and description setup",
-    ],
-    excludes: [
-      "Writing or sourcing portfolio content and images",
-      "Custom booking, payment or client-login features",
-      "Domain registration, hosting and paid third-party tools",
-    ],
-    timeframe:
-      "Delivery timing and start date are confirmed in the written proposal after the brief, scope and content are reviewed.",
-    revisions: "2 rounds of consolidated design revisions.",
-    separateFees:
-      "Domain, hosting, email, subscriptions and any third-party fees are separate.",
-    nextStep:
-      "Send your brief. GROWTHLY will confirm fit, scope and timing in writing before any work begins.",
-  },
-  {
-    id: "professional-portfolio",
-    name: "Professional Portfolio",
-    price: "₦100,000",
-    priceValue: 100000,
-    availability: "Availability and start date confirmed after the brief.",
-    positioning: "More room to explain your offer and present a fuller body of work.",
-    includes: [
-      "Up to 5 coordinated pages, scoped from the agreed brief",
-      "A custom visual direction for your portfolio",
-      "A gallery for up to 12 supplied projects",
-      "Responsive design and clear enquiry calls to action",
-      "Basic page title and description setup",
-    ],
-    excludes: [
-      "Writing or sourcing portfolio content and images",
-      "Custom booking, payment or client-login features",
-      "Domain registration, hosting and paid third-party tools",
-    ],
-    timeframe:
-      "Delivery timing and start date are confirmed in the written proposal after the brief, scope and content are reviewed.",
-    revisions: "2 rounds of consolidated design revisions.",
-    separateFees:
-      "Domain, hosting, email, subscriptions and any third-party fees are separate.",
-    nextStep:
-      "Send your brief. GROWTHLY will confirm fit, scope and timing in writing before any work begins.",
-  },
-  {
-    id: "premium-creative-studio",
-    name: "Premium Creative Studio",
-    price: "₦180,000+",
-    priceValue: 180000,
-    availability: "Availability and start date confirmed after the brief.",
+    id: "starter-website",
+    name: "Starter Website",
     positioning:
-      "A more bespoke portfolio experience for a designer or creative studio with a larger story to tell.",
+      "For a small business that needs a clear, professional first home online.",
     includes: [
-      "A tailored website plan of up to 8 pages, subject to the agreed scope",
-      "Bespoke visual direction and project presentation system",
-      "Responsive layouts and clear enquiry pathways",
-      "Basic page title and description setup",
-      "A handover walkthrough for the delivered site",
+      "A focused one-page website or compact page set agreed in the proposal",
+      "Business introduction, services and contact information",
+      "Mobile-friendly layout and WhatsApp contact",
+      "Page titles, descriptions and search-friendly structure",
     ],
-    excludes: [
-      "Writing or sourcing portfolio content and images",
-      "Custom booking, payment, e-commerce or client-login features",
-      "Domain registration, hosting and paid third-party tools",
-    ],
-    timeframe:
-      "Confirmed after reviewing the brief; a larger or more involved scope may take longer.",
-    revisions: "3 rounds of consolidated design revisions.",
-    separateFees:
-      "Domain, hosting, email, subscriptions and any third-party fees are separate.",
-    nextStep:
-      "Share your goals and references. GROWTHLY will return a written scope and quote for approval.",
   },
-];
+  {
+    id: "business-website",
+    name: "Business Website",
+    positioning:
+      "For a growing business with more to explain and more ways to enquire.",
+    includes: [
+      "A multi-page site: home, about, services and contact; final count agreed",
+      "Dedicated product or service information",
+      "Enquiry functionality and clear calls to action",
+      "Analytics or content editing options, when scoped",
+    ],
+  },
+  {
+    id: "ecommerce-website",
+    name: "E-commerce Website",
+    positioning:
+      "For retailers ready to take products from discovery to ordering.",
+    includes: [
+      "Storefront, product listings and product detail templates",
+      "Product count and category structure agreed in writing",
+      "Cart, checkout and payment provider integration when scoped",
+      "Order management and a handover walkthrough",
+    ],
+  },
+].map((item) => ({
+  ...item,
+  price: "Request a quote",
+  priceValue: 0,
+  availability: "Start date agreed after reviewing your brief.",
+  timeframe:
+    "Estimated delivery is confirmed in your proposal, after scope and content review.",
+  revisions: "Review rounds and any extra-change charges agreed in writing.",
+  separateFees:
+    "Domain, hosting, email, maintenance, paid tools and payment-provider fees are separate unless included in writing.",
+  nextStep: "Receive a written scope and quote before committing.",
+  excludes: [
+    "Content creation and photography unless scoped.",
+    "Ongoing maintenance and third-party subscriptions unless agreed.",
+  ],
+}));
 
 export const budgetOptions = [
   { value: "under-100k", label: "Below ₦100,000" },

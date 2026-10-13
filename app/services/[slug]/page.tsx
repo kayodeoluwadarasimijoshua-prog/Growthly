@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArrowRight, Check } from "lucide-react";
 import { services } from "@/config/content";
 import { PackageGrid } from "@/components/PackageGrid";
@@ -22,10 +22,20 @@ export async function generateMetadata({
   const { slug } = await params;
   const service = services.find((item) => item.slug === slug);
   if (!service) return {};
-  return pageMetadata(service.title, service.summary, `/services/${service.slug}`);
+  return pageMetadata(
+    service.title,
+    service.summary,
+    `/services/${service.slug}`,
+  );
 }
 
-function ServiceSchema({ name, description }: { name: string; description: string }) {
+function ServiceSchema({
+  name,
+  description,
+}: {
+  name: string;
+  description: string;
+}) {
   const siteUrl = getSiteUrl();
   if (!siteUrl) return null;
   const schema = {
@@ -36,7 +46,14 @@ function ServiceSchema({ name, description }: { name: string; description: strin
     provider: { "@type": "Organization", name: "GROWTHLY", url: siteUrl },
     areaServed: { "@type": "Country", name: "Nigeria" },
   };
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />;
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schema).replace(/</g, "\\u003c"),
+      }}
+    />
+  );
 }
 
 export default async function ServiceDetailPage({
@@ -47,6 +64,7 @@ export default async function ServiceDetailPage({
   const { slug } = await params;
   const service = services.find((item) => item.slug === slug);
   if (!service) notFound();
+  if (slug === "website-development") permanentRedirect("/website-development");
 
   return (
     <>
@@ -58,8 +76,13 @@ export default async function ServiceDetailPage({
             <h1>{service.title}</h1>
             <p>{service.introduction}</p>
             <div className="hero-actions">
-              <StartProjectLink label="Discuss this service" service={service.slug} />
-              <Link className="button button--outline" href="/services">All services <ArrowRight size={16} aria-hidden="true" /></Link>
+              <StartProjectLink
+                label="Discuss this service"
+                service={service.slug}
+              />
+              <Link className="button button--outline" href="/services">
+                All services <ArrowRight size={16} aria-hidden="true" />
+              </Link>
             </div>
           </div>
           <div className="page-hero__aside">
@@ -74,23 +97,42 @@ export default async function ServiceDetailPage({
           <div>
             <h2>What a project can include</h2>
             <ul className="check-list">
-              {service.deliverables.map((item) => <li key={item}><Check size={16} aria-hidden="true" /><span>{item}</span></li>)}
+              {service.deliverables.map((item) => (
+                <li key={item}>
+                  <Check size={16} aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
             <h2>How we work</h2>
             <p>{service.workingStyle}</p>
-            <div className="mt-32"><StartProjectLink label="Start a project brief" service={service.slug} /></div>
+            <div className="mt-32">
+              <StartProjectLink
+                label="Start a project brief"
+                service={service.slug}
+              />
+            </div>
           </div>
           <aside className="service-aside">
             <h3>Scope and exclusions</h3>
-            <p>Before any work starts, your written proposal will clarify what’s in and what needs a separate quote.</p>
-            <ul>{service.boundaries.map((item) => <li key={item}>{item}</li>)}</ul>
+            <p>
+              Before any work starts, your written proposal will clarify what’s
+              in and what needs a separate quote.
+            </p>
+            <ul>
+              {service.boundaries.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </aside>
         </div>
       </section>
 
       {service.slug === "website-development" ? (
         <section className="section section--soft" id="portfolio-packages">
-          <div className="container"><PackageGrid heading /></div>
+          <div className="container">
+            <PackageGrid heading />
+          </div>
         </section>
       ) : null}
 
@@ -103,7 +145,12 @@ export default async function ServiceDetailPage({
       </section>
 
       <section className="section section--compact">
-        <div className="container"><ClosingCTA title={`Have a ${service.shortTitle.toLowerCase()} project in mind?`} description="Share the goal, not just a list of deliverables. We’ll review what you need and outline a practical next step." /></div>
+        <div className="container">
+          <ClosingCTA
+            title={`Have a ${service.shortTitle.toLowerCase()} project in mind?`}
+            description="Share the goal, not just a list of deliverables. We’ll review what you need and outline a practical next step."
+          />
+        </div>
       </section>
     </>
   );

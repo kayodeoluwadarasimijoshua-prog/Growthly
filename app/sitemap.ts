@@ -9,13 +9,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const paths = [
     "/",
     "/services",
-    ...services.map((service) => `/services/${service.slug}`),
-    "/work",
-    ...projects.map((project) => `/work/${project.slug}`),
+    ...services
+      .filter((s) => s.slug !== "website-development")
+      .map((service) => `/services/${service.slug}`),
+    "/portfolio",
+    ...projects.map((project) => `/portfolio/${project.slug}`),
     "/about",
-    "/start-project",
+    "/request-a-quote",
     "/contact",
-    "/privacy",
+    "/privacy-policy",
+    "/terms",
+    "/website-development",
+    "/business-websites",
+    "/ecommerce-websites",
+    "/industries",
+    "/pricing",
   ];
   return paths.map((path) => ({ url: `${siteUrl}${path}` }));
 }

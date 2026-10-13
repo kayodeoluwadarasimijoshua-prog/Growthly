@@ -13,7 +13,11 @@ describe("same-origin request guard", () => {
   it("rejects a cross-origin request", () => {
     const request = new Request("https://growthly.example/api/admin/leads/1", {
       method: "POST",
-      headers: { origin: "https://attacker.example", host: "growthly.example", "sec-fetch-site": "cross-site" },
+      headers: {
+        origin: "https://attacker.example",
+        host: "growthly.example",
+        "sec-fetch-site": "cross-site",
+      },
     });
     expect(isSameOriginRequest(request)).toBe(false);
   });

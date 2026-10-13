@@ -1,5 +1,16 @@
-export type LeadStatus = "new" | "contacted" | "qualified" | "proposal_sent" | "won" | "lost";
-export type DepositStatus = "not-discussed" | "not-requested" | "awaiting" | "partial" | "paid";
+export type LeadStatus =
+  | "new"
+  | "contacted"
+  | "qualified"
+  | "proposal_sent"
+  | "won"
+  | "lost";
+export type DepositStatus =
+  | "not-discussed"
+  | "not-requested"
+  | "awaiting"
+  | "partial"
+  | "paid";
 
 export type LeadRecord = {
   id: string;

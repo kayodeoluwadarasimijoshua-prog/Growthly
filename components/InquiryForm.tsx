@@ -1,268 +1,429 @@
 "use client";
-
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
-import { services } from "@/config/content";
-import { budgetOptions, portfolioPackages } from "@/config/business";
-import { trackLeadConversion } from "@/lib/analytics";
+import { budgetOptions, websitePackages } from "@/config/business";
+import { websiteTypes } from "@/config/websites";
+import { validateInquiry } from "@/lib/inquiries";
+import { getWhatsAppUrl } from "@/lib/site";
+import { trackLeadConversion, trackEvent } from "@/lib/analytics";
 import { getUtmAttribution } from "@/lib/attribution";
-
-const deadlineOptions = [
-  { value: "flexible", label: "I’m flexible" },
-  { value: "within-2-weeks", label: "Within 2 weeks" },
-  { value: "2-4-weeks", label: "In 2–4 weeks" },
-  { value: "1-2-months", label: "In 1–2 months" },
-  { value: "specific-date", label: "I have a specific date" },
-];
-
-type FormState = { kind: "idle" | "submitting" | "success" | "error"; message?: string };
-
+import { WhatsAppButton } from "@/components/ContactLinks";
+type Status = {
+  kind: "idle" | "loading" | "success" | "error" | "handoff";
+  message?: string;
+};
 export function InquiryForm({
-  initialService = "",
   initialPackage = "",
+  initialType = "",
+  deliveryEnabled = false,
 }: {
-  initialService?: string;
   initialPackage?: string;
+  initialType?: string;
+  deliveryEnabled?: boolean;
 }) {
-  const knownService = services.some((service) => service.slug === initialService) ? initialService : "";
-  const knownPackage = portfolioPackages.some((item) => item.id === initialPackage) ? initialPackage : "";
-  const [service, setService] = useState(knownService);
-  const [packageId, setPackageId] = useState(knownPackage || "custom");
-  const [deadlineChoice, setDeadlineChoice] = useState("flexible");
-  const [status, setStatus] = useState<FormState>({ kind: "idle" });
-  const packagesAvailable = service === "website-development";
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [handoff, setHandoff] = useState("");
+  const knownPackage = websitePackages.some((p) => p.id === initialPackage)
+    ? initialPackage
+    : "custom";
+  const error = (id: string) =>
+    errors[id] ? (
+      <small id={`${id}-error`} className="field-error">
+        {errors[id]}
+      </small>
+    ) : null;
+  const attributes = (id: string) => ({
+    "aria-invalid": !!errors[id],
+    "aria-describedby": errors[id] ? `${id}-error` : undefined,
+  });
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const values = new FormData(form);
-    const email = String(values.get("email") ?? "").trim();
-    const phone = String(values.get("phone") ?? "").trim();
-    const preferredContact = String(values.get("preferred_contact") ?? "whatsapp");
-    const preferredDate = String(values.get("preferred_deadline_date") ?? "");
-
-    if (!email && !phone) {
-      setStatus({ kind: "error", message: "Add an email address or phone number so we can reply." });
-      document.getElementById(preferredContact === "email" ? "email" : "phone")?.focus();
-      return;
-    }
-    if (preferredContact === "email" && !email) {
-      setStatus({ kind: "error", message: "Add an email address, or choose WhatsApp or phone as your preferred contact." });
-      document.getElementById("email")?.focus();
-      return;
-    }
-    if ((preferredContact === "whatsapp" || preferredContact === "phone") && !phone) {
-      setStatus({ kind: "error", message: "Add a phone number, or choose email as your preferred contact." });
-      document.getElementById("phone")?.focus();
-      return;
-    }
-    if (deadlineChoice === "specific-date" && !preferredDate) {
-      setStatus({ kind: "error", message: "Choose a preferred date or select a flexible timeframe." });
-      document.getElementById("preferred_deadline_date")?.focus();
-      return;
-    }
-    if (preferredDate && preferredDate < new Date().toISOString().slice(0, 10)) {
-      setStatus({ kind: "error", message: "Choose a future preferred date or select a flexible timeframe." });
-      document.getElementById("preferred_deadline_date")?.focus();
-      return;
-    }
-
+    const f = new FormData(form);
+    const text = (name: string) => String(f.get(name) ?? "").trim();
     const payload = {
-      full_name: String(values.get("full_name") ?? "").trim(),
-      business_name: String(values.get("business_name") ?? "").trim(),
-      email,
-      phone,
-      preferred_contact: preferredContact,
-      service,
-      package_id: packagesAvailable ? packageId : "custom",
-      brief: String(values.get("brief") ?? "").trim(),
-      budget_range: String(values.get("budget_range") ?? ""),
-      preferred_deadline: deadlineChoice === "specific-date" ? preferredDate : deadlineChoice,
-      website: String(values.get("website") ?? ""),
+      full_name: text("full_name"),
+      business_name: text("business_name"),
+      phone: text("phone"),
+      email: text("email"),
+      preferred_contact: text("preferred_contact"),
+      service: "website-development",
+      website_type: text("website_type"),
+      package_id: text("package_id"),
+      brief: text("brief"),
+      existing_url: text("existing_url"),
+      industry: text("industry"),
+      required_features: text("required_features"),
+      budget_range: text("budget_range") || "not-sure",
+      preferred_deadline: text("preferred_deadline") || "flexible",
+      consent: f.get("consent") === "on",
+      website: text("website"),
       attribution: getUtmAttribution(),
     };
-
-    setStatus({ kind: "submitting" });
+    const parsed = validateInquiry(payload);
+    if (!parsed.success) {
+      const next: Record<string, string> = {};
+      parsed.error.issues.forEach((i) => {
+        const key = String(i.path[0]);
+        if (!next[key]) next[key] = i.message;
+      });
+      setErrors(next);
+      setStatus({
+        kind: "error",
+        message: "Please check the highlighted fields.",
+      });
+      const invalid = form.querySelector<HTMLElement>(
+        `[name="${Object.keys(next)[0]}"]`,
+      );
+      const details = invalid?.closest("details");
+      if (details) details.open = true;
+      invalid?.focus();
+      return;
+    }
+    if (payload.website) {
+      setStatus({
+        kind: "error",
+        message: "This request could not be accepted.",
+      });
+      return;
+    }
+    setErrors({});
+    const message = [
+      "Hello GROWTHLY, I’d like a website quote.",
+      `Name: ${payload.full_name}`,
+      `Business: ${payload.business_name}`,
+      `Phone: ${payload.phone}`,
+      payload.email ? `Email: ${payload.email}` : "",
+      `Website type: ${payload.website_type}`,
+      `Package: ${payload.package_id}`,
+      `Preferred contact: ${payload.preferred_contact}`,
+      `Budget preference: ${payload.budget_range}`,
+      `Launch preference: ${payload.preferred_deadline}`,
+      payload.existing_url ? `Existing website: ${payload.existing_url}` : "",
+      payload.industry ? `Industry: ${payload.industry}` : "",
+      payload.required_features ? `Features: ${payload.required_features}` : "",
+      `Brief: ${payload.brief}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+    setHandoff(getWhatsAppUrl(message));
+    if (!deliveryEnabled) {
+      setStatus({ kind: "handoff" });
+      return;
+    }
+    setStatus({ kind: "loading" });
     try {
       const response = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(20000),
       });
-      const result = (await response.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
-      if (!response.ok || result?.ok !== true) {
+      const result = await response.json();
+      if (!response.ok || result.ok !== true) {
         setStatus({
           kind: "error",
           message:
-            result?.message ??
-            "We couldn’t confirm delivery. Please try again or use one of the direct contact options.",
+            result.message ||
+            "Delivery could not be confirmed. Your details are still here; try again or send the brief on WhatsApp.",
         });
         return;
       }
-
       setStatus({
         kind: "success",
-        message: "Your project request has been received. GROWTHLY will follow up using the contact method you selected.",
+        message:
+          "Your enquiry has been received by our configured system. Growthly will review the brief and follow up using your preferred contact method.",
       });
-      form.reset();
-      setService(knownService);
-      setPackageId(knownPackage || "custom");
-      setDeadlineChoice("flexible");
       trackLeadConversion();
+      form.reset();
     } catch {
       setStatus({
         kind: "error",
-        message: "We couldn’t reach the inquiry service. Please try again or contact GROWTHLY directly.",
+        message:
+          "We couldn’t confirm delivery. Your details have not been cleared. Try again or continue on WhatsApp.",
       });
     }
   }
-
   return (
-    <form className="inquiry-form" onSubmit={handleSubmit}>
+    <form
+      className="inquiry-form"
+      onSubmit={submit}
+      noValidate
+      onChange={() => {
+        if (status.kind === "handoff") {
+          setStatus({ kind: "idle" });
+          setHandoff("");
+        }
+      }}
+    >
       <div className="form-intro">
-        <h2>Tell us what you’re working on.</h2>
-        <p>Share a few details. We’ll review the fit and follow up with clear next steps.</p>
+        <h2>Tell us about your website.</h2>
+        <p>
+          Required fields are marked *. Budget and launch date are preferences,
+          not an agreed price or deadline.
+        </p>
       </div>
-
-      {status.kind === "success" ? (
-        <div className="form-status form-status--success" role="status" aria-live="polite">
-          <strong>Request received.</strong> {status.message}
+      {!deliveryEnabled && (
+        <div className="delivery-note">
+          <strong>Send your brief through WhatsApp.</strong>
+          <p>
+            Online delivery is not enabled here. This form prepares a message on
+            your device; nothing is submitted to Growthly until you open
+            WhatsApp and press Send. You’ll need WhatsApp access. Prefer a call?
+            Use the contact options beside this form.
+          </p>
         </div>
-      ) : null}
-      {status.kind === "error" ? (
+      )}
+      {status.kind === "error" && (
         <div className="form-status form-status--error" role="alert">
           {status.message}
         </div>
-      ) : null}
-
+      )}
+      {status.kind === "success" && (
+        <div className="form-status form-status--success" role="status">
+          <strong>Request received.</strong>
+          <p>{status.message}</p>
+          <WhatsAppButton label="Continue on WhatsApp" />
+        </div>
+      )}
       <div className="form-row">
         <div className="form-field">
-          <label htmlFor="service">What do you need help with? <span aria-hidden="true">*</span></label>
-          <select
-            id="service"
-            name="service"
-            value={service}
-            onChange={(event) => {
-              setService(event.target.value);
-              setPackageId("custom");
-              setStatus({ kind: "idle" });
-            }}
+          <label htmlFor="full_name">Your name *</label>
+          <input
+            id="full_name"
+            name="full_name"
+            autoComplete="name"
             required
-          >
-            <option value="">Select a service</option>
-            {services.map((item) => <option value={item.slug} key={item.slug}>{item.title}</option>)}
-          </select>
+            maxLength={120}
+            {...attributes("full_name")}
+          />
+          {error("full_name")}
         </div>
         <div className="form-field">
-          <label htmlFor="package">Package or project type</label>
-          <select
-            id="package"
-            name="package_id"
-            value={packagesAvailable ? packageId : "custom"}
-            onChange={(event) => setPackageId(event.target.value)}
-            disabled={!packagesAvailable}
-          >
-            <option value="custom">Custom project / not sure</option>
-            {packagesAvailable ? portfolioPackages.map((item) => (
-              <option value={item.id} key={item.id}>{item.name} · {item.price}</option>
-            )) : null}
-          </select>
-          <small>
-            {packagesAvailable
-              ? "Published packages are for graphic-designer portfolio websites only."
-              : "Custom scope and pricing are confirmed after reviewing your brief."}
-          </small>
+          <label htmlFor="business_name">Business name *</label>
+          <input
+            id="business_name"
+            name="business_name"
+            autoComplete="organization"
+            required
+            maxLength={140}
+            {...attributes("business_name")}
+          />
+          {error("business_name")}
         </div>
       </div>
-
       <div className="form-row">
         <div className="form-field">
-          <label htmlFor="business_name">Business or brand name</label>
-          <input id="business_name" name="business_name" autoComplete="organization" maxLength={140} placeholder="e.g. your business name" />
+          <label htmlFor="phone">WhatsApp or telephone number *</label>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            required
+            maxLength={30}
+            {...attributes("phone")}
+          />
+          {error("phone")}
         </div>
         <div className="form-field">
-          <label htmlFor="budget_range">Estimated budget <span aria-hidden="true">*</span></label>
-          <select id="budget_range" name="budget_range" required defaultValue="">
-            <option value="" disabled>Select a range</option>
-            {budgetOptions.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
-          </select>
-          <small>A guide only—your written proposal will confirm the cost.</small>
+          <label htmlFor="email">Email, if available</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            maxLength={254}
+            {...attributes("email")}
+          />
+          {error("email")}
         </div>
       </div>
-
+      <div className="form-row">
+        <div className="form-field">
+          <label htmlFor="website_type">Website type *</label>
+          <select
+            id="website_type"
+            name="website_type"
+            defaultValue={
+              websiteTypes.some((t) => t === initialType) ? initialType : ""
+            }
+            required
+            {...attributes("website_type")}
+          >
+            <option value="">Select a website type</option>
+            {websiteTypes.map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+          {error("website_type")}
+        </div>
+        <div className="form-field">
+          <label htmlFor="package_id">Solution you’re considering</label>
+          <select id="package_id" name="package_id" defaultValue={knownPackage}>
+            <option value="custom">Custom / help me choose</option>
+            {websitePackages.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
       <div className="form-field">
-        <label htmlFor="brief">What would you like to create or improve? <span aria-hidden="true">*</span></label>
+        <label htmlFor="brief">What does your website need to do? *</label>
         <textarea
           id="brief"
           name="brief"
-          required
           minLength={20}
-          maxLength={4000}
-          placeholder="Tell us about your business, who you serve, what you need and what a useful result would look like."
+          maxLength={2400}
+          required
+          placeholder="Tell us what you sell, who your customers are and what you want them to do on your website."
+          {...attributes("brief")}
         />
-        <small>At least 20 characters. Please don’t include passwords or sensitive personal information.</small>
+        <small>
+          At least 20 characters. Don’t include passwords or sensitive
+          information.
+        </small>
+        {error("brief")}
       </div>
-
-      <div className="form-row">
-        <div className="form-field">
-          <label htmlFor="deadline">Preferred timing</label>
-          <select
-            id="deadline"
-            name="deadline_choice"
-            value={deadlineChoice}
-            onChange={(event) => setDeadlineChoice(event.target.value)}
-          >
-            {deadlineOptions.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
-          </select>
-        </div>
-        {deadlineChoice === "specific-date" ? (
+      <details className="form-optionals">
+        <summary>Add optional project details</summary>
+        <div className="form-row">
           <div className="form-field">
-            <label htmlFor="preferred_deadline_date">Preferred date <span aria-hidden="true">*</span></label>
-            <input id="preferred_deadline_date" name="preferred_deadline_date" type="date" required />
+            <label htmlFor="existing_url">Existing website URL</label>
+            <input
+              id="existing_url"
+              name="existing_url"
+              type="url"
+              placeholder="https://"
+              maxLength={500}
+              {...attributes("existing_url")}
+            />
+            {error("existing_url")}
           </div>
-        ) : (
           <div className="form-field">
-            <label htmlFor="full_name">Your name <span aria-hidden="true">*</span></label>
-            <input id="full_name" name="full_name" autoComplete="name" minLength={2} maxLength={120} required placeholder="Full name" />
+            <label htmlFor="industry">Industry</label>
+            <input id="industry" name="industry" maxLength={140} />
           </div>
-        )}
-      </div>
-      {deadlineChoice === "specific-date" ? (
-        <div className="form-field">
-          <label htmlFor="full_name">Your name <span aria-hidden="true">*</span></label>
-          <input id="full_name" name="full_name" autoComplete="name" minLength={2} maxLength={120} required placeholder="Full name" />
         </div>
-      ) : null}
-
-      <div className="form-row">
-        <div className="form-field">
-          <label htmlFor="email">Email address</label>
-          <input id="email" name="email" type="email" autoComplete="email" maxLength={254} placeholder="you@example.com" />
+        <div className="form-row">
+          <div className="form-field">
+            <label htmlFor="budget_range">Budget preference</label>
+            <select
+              id="budget_range"
+              name="budget_range"
+              defaultValue="not-sure"
+            >
+              {budgetOptions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+            <small>Not Growthly’s package prices.</small>
+          </div>
+          <div className="form-field">
+            <label htmlFor="preferred_deadline">Desired launch date</label>
+            <input
+              id="preferred_deadline"
+              name="preferred_deadline"
+              type="date"
+              {...attributes("preferred_deadline")}
+            />
+            {error("preferred_deadline")}
+          </div>
         </div>
         <div className="form-field">
-          <label htmlFor="phone">WhatsApp or phone number</label>
-          <input id="phone" name="phone" type="tel" autoComplete="tel" minLength={7} maxLength={30} pattern="[0-9+().\s-]+" placeholder="e.g. 0800 000 0000" />
+          <label htmlFor="required_features">Required features</label>
+          <input
+            id="required_features"
+            name="required_features"
+            placeholder="e.g. product catalogue, online payment, booking"
+            maxLength={600}
+          />
         </div>
-      </div>
+      </details>
       <div className="form-field">
-        <label htmlFor="preferred_contact">How should we contact you? <span aria-hidden="true">*</span></label>
-        <select id="preferred_contact" name="preferred_contact" defaultValue="whatsapp" required>
+        <label htmlFor="preferred_contact">Preferred follow-up method</label>
+        <select
+          name="preferred_contact"
+          id="preferred_contact"
+          defaultValue="whatsapp"
+        >
           <option value="whatsapp">WhatsApp</option>
+          <option value="phone">Telephone call</option>
           <option value="email">Email</option>
-          <option value="phone">Phone call</option>
         </select>
       </div>
-
       <div className="honeypot" aria-hidden="true">
         <label htmlFor="website">Leave this field empty</label>
         <input id="website" name="website" tabIndex={-1} autoComplete="off" />
       </div>
-
-      <button className="button button--primary" type="submit" disabled={status.kind === "submitting"}>
-        {status.kind === "submitting" ? <><LoaderCircle size={17} className="spin" aria-hidden="true" /> Sending request…</> : <>Send project request <ArrowRight size={16} aria-hidden="true" /></>}
+      <div className="consent-field">
+        <label>
+          <input
+            name="consent"
+            type="checkbox"
+            required
+            {...attributes("consent")}
+          />{" "}
+          <span>
+            I agree that Growthly may use these details to discuss my request as
+            explained in the{" "}
+            <Link className="text-link" href="/privacy-policy">
+              privacy policy
+            </Link>
+            . *
+          </span>
+        </label>
+        {error("consent")}
+      </div>
+      <button
+        className="button button--primary"
+        type="submit"
+        disabled={status.kind === "loading"}
+      >
+        {status.kind === "loading" ? (
+          <>
+            <LoaderCircle size={18} className="spin" aria-hidden="true" />{" "}
+            Sending enquiry…
+          </>
+        ) : (
+          <>
+            {deliveryEnabled ? "Send quote request" : "Prepare WhatsApp brief"}
+            <ArrowRight size={17} aria-hidden="true" />
+          </>
+        )}
       </button>
+      {status.kind === "handoff" && (
+        <div className="form-status" role="status">
+          <strong>Your brief is ready—not yet sent.</strong>
+          <p>
+            Open WhatsApp, review the message and press Send. This website
+            cannot confirm WhatsApp delivery.
+          </p>
+        </div>
+      )}
+      {handoff && status.kind !== "success" && (
+        <button
+          type="button"
+          className="button button--outline"
+          onClick={() => {
+            // A button avoids exposing the personal brief as an auto-tracked outbound link URL.
+            trackEvent("whatsapp_click");
+            window.open(handoff, "_blank", "noopener,noreferrer");
+          }}
+        >
+          Open WhatsApp with my brief{" "}
+          <ArrowRight size={16} aria-hidden="true" />
+        </button>
+      )}
       <p className="form-fineprint">
-        By submitting, you agree that GROWTHLY may use these details to respond to your enquiry. We don’t send your personal details to advertising or analytics platforms.
+        No payment or commitment. We agree the scope and quote before your
+        project begins.
       </p>
     </form>
   );

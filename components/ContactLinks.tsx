@@ -23,7 +23,8 @@ export function WhatsAppButton({
       rel="noreferrer"
       onClick={() => trackEvent("whatsapp_click")}
     >
-      <MessageCircle size={16} aria-hidden="true" /> {label} <ArrowUpRight size={15} aria-hidden="true" />
+      <MessageCircle size={16} aria-hidden="true" /> {label}{" "}
+      <ArrowUpRight size={15} aria-hidden="true" />
     </a>
   );
 }
@@ -33,16 +34,22 @@ export function PhoneLink({ compact = false }: { compact?: boolean }) {
     <a
       className={compact ? "text-link" : "button button--outline"}
       href={getPhoneHref(business.contact.alternativePhone)}
-      onClick={() => trackEvent("phone_click", { contact_type: "alternative_phone" })}
+      onClick={() =>
+        trackEvent("phone_click", { contact_type: "alternative_phone" })
+      }
     >
-      {compact ? <Phone size={15} aria-hidden="true" /> : <Phone size={16} aria-hidden="true" />}
+      {compact ? (
+        <Phone size={15} aria-hidden="true" />
+      ) : (
+        <Phone size={16} aria-hidden="true" />
+      )}
       Call {business.contact.alternativePhone}
     </a>
   );
 }
 
 export function StartProjectLink({
-  label = "Start your project",
+  label = "Get a Website Quote",
   service,
   className = "button button--primary",
 }: {
@@ -50,12 +57,16 @@ export function StartProjectLink({
   service?: string;
   className?: string;
 }) {
-  const href = service ? `/start-project?service=${encodeURIComponent(service)}` : "/start-project";
+  const href = service
+    ? `/request-a-quote?service=${encodeURIComponent(service)}`
+    : "/request-a-quote";
   return (
     <Link
       className={className}
       href={href}
-      onClick={() => trackEvent("service_cta_click", service ? { service } : undefined)}
+      onClick={() =>
+        trackEvent("quote_cta_click", service ? { service } : undefined)
+      }
     >
       {label} <ArrowRight size={16} aria-hidden="true" />
     </Link>

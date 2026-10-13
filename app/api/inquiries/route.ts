@@ -4,7 +4,10 @@ import { services } from "@/config/content";
 import { validateInquiry } from "@/lib/inquiries";
 import { checkRateLimit, requestIp } from "@/lib/rate-limit";
 import { isSameOriginRequest } from "@/lib/request-security";
-import { createSupabaseLeadWriter, hasSupabaseLeadStoreConfig } from "@/lib/supabase/server";
+import {
+  createSupabaseLeadWriter,
+  hasSupabaseLeadStoreConfig,
+} from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -23,9 +26,15 @@ function leadEmailText(lead: {
   preferred_deadline: string;
   attribution: Record<string, string>;
 }) {
-  const serviceName = services.find((item) => item.slug === lead.service)?.title ?? lead.service;
-  const budget = budgetOptions.find((item) => item.value === lead.budget_range)?.label ?? lead.budget_range;
-  const attribution = Object.entries(lead.attribution).map(([key, value]) => `${key}: ${value}`).join("\n") || "None";
+  const serviceName =
+    services.find((item) => item.slug === lead.service)?.title ?? lead.service;
+  const budget =
+    budgetOptions.find((item) => item.value === lead.budget_range)?.label ??
+    lead.budget_range;
+  const attribution =
+    Object.entries(lead.attribution)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join("\n") || "None";
   return [
     "New GROWTHLY project enquiry",
     "",
@@ -72,7 +81,10 @@ async function sendLeadEmail(text: string) {
       console.error("Lead email delivery failed", response.status);
       return false;
     }
-    return true;
+    const receipt = (await response.json().catch(() => null)) as {
+      id?: string;
+    } | null;
+    return Boolean(receipt?.id);
   } catch {
     console.error("Lead email delivery failed");
     return false;
@@ -81,45 +93,97 @@ async function sendLeadEmail(text: string) {
 
 export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
-    return NextResponse.json({ message: "This request could not be accepted." }, { status: 403 });
+    return NextResponse.json(
+      { message: "This request could not be accepted." },
+      { status: 403 },
+    );
   }
 
   const ip = requestIp(request);
   const limit = checkRateLimit(`inquiry:${ip}`, 5, 10 * 60 * 1000);
   if (!limit.allowed) {
     return NextResponse.json(
-      { message: "Too many requests from this connection. Please wait a few minutes or contact GROWTHLY directly." },
-      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+      {
+        message:
+          "Too many requests from this connection. Please wait a few minutes or contact GROWTHLY directly.",
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(limit.retryAfterSeconds) },
+      },
     );
   }
 
   const declaredLength = Number(request.headers.get("content-length") ?? "0");
   if (declaredLength > MAX_BODY_BYTES) {
-    return NextResponse.json({ message: "The request is too large. Please shorten your brief and try again." }, { status: 413 });
+    return NextResponse.json(
+      {
+        message:
+          "The request is too large. Please shorten your brief and try again.",
+      },
+      { status: 413 },
+    );
   }
 
   let input: unknown;
   try {
     const body = await request.text();
     if (new TextEncoder().encode(body).byteLength > MAX_BODY_BYTES) {
-      return NextResponse.json({ message: "The request is too large. Please shorten your brief and try again." }, { status: 413 });
+      return NextResponse.json(
+        {
+          message:
+            "The request is too large. Please shorten your brief and try again.",
+        },
+        { status: 413 },
+      );
     }
     input = JSON.parse(body);
   } catch {
-    return NextResponse.json({ message: "Please check the form and try again." }, { status: 400 });
+    return NextResponse.json(
+      { message: "Please check the form and try again." },
+      { status: 400 },
+    );
   }
 
   const parsed = validateInquiry(input);
   if (!parsed.success) {
-    return NextResponse.json({ message: "Check the required fields and contact details, then try again." }, { status: 400 });
+    return NextResponse.json(
+      {
+        message:
+          "Check the required fields and contact details, then try again.",
+      },
+      { status: 400 },
+    );
   }
   const lead = parsed.data;
+  // Keep the existing database schema: optional requirements form part of the private brief.
+  lead.brief = [
+    `Website type: ${lead.website_type}`,
+    lead.existing_url ? `Existing URL: ${lead.existing_url}` : "",
+    lead.industry ? `Industry: ${lead.industry}` : "",
+    lead.required_features ? `Features: ${lead.required_features}` : "",
+    "Privacy consent: accepted",
+    "",
+    lead.brief,
+  ]
+    .filter(Boolean)
+    .join("\n");
   if (lead.website.trim()) {
-    return NextResponse.json({ message: "This request could not be accepted. Please check the form and try again." }, { status: 400 });
+    return NextResponse.json(
+      {
+        message:
+          "This request could not be accepted. Please check the form and try again.",
+      },
+      { status: 400 },
+    );
   }
 
   const emailText = leadEmailText(lead);
-  const emailConfigured = Boolean(process.env.RESEND_API_KEY && process.env.LEADS_EMAIL && process.env.RESEND_FROM_EMAIL);
+  const emailConfigured = Boolean(
+    process.env.RESEND_API_KEY &&
+      process.env.LEADS_EMAIL &&
+      process.env.RESEND_FROM_EMAIL,
+  );
   let saved = false;
 
   if (hasSupabaseLeadStoreConfig()) {
@@ -151,16 +215,23 @@ export async function POST(request: NextRequest) {
 
   if (saved) {
     if (emailConfigured) await sendLeadEmail(emailText);
-    return NextResponse.json({ ok: true }, { status: 201 });
+    return NextResponse.json(
+      { ok: true },
+      { status: 201, headers: { "Cache-Control": "no-store" } },
+    );
   }
 
-  if (emailConfigured && await sendLeadEmail(emailText)) {
-    return NextResponse.json({ ok: true }, { status: 201 });
+  if (emailConfigured && (await sendLeadEmail(emailText))) {
+    return NextResponse.json(
+      { ok: true },
+      { status: 201, headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   return NextResponse.json(
     {
-      message: "The inquiry service is not available right now. Your request was not confirmed. Please contact GROWTHLY on WhatsApp or phone instead.",
+      message:
+        "The inquiry service is not available right now. Your request was not confirmed. Please contact GROWTHLY on WhatsApp or phone instead.",
     },
     { status: 503 },
   );

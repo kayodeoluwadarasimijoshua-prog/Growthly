@@ -3,7 +3,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { trackEvent } from "@/lib/analytics";
+import { safeReferrer, trackEvent } from "@/lib/analytics";
 import { captureUtmAttribution } from "@/lib/attribution";
 
 const CONSENT_KEY = "growthly_analytics_consent";
@@ -31,7 +31,11 @@ function subscribeToConsent(callback: () => void) {
 
 export function AnalyticsConsent() {
   const pathname = usePathname();
-  const choice = useSyncExternalStore(subscribeToConsent, getConsentSnapshot, () => "unknown");
+  const choice = useSyncExternalStore(
+    subscribeToConsent,
+    getConsentSnapshot,
+    () => "unknown",
+  );
   const gaId = process.env.NEXT_PUBLIC_GA4_ID;
   const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
   const analyticsConfigured = Boolean(gaId || adsId);
@@ -66,7 +70,11 @@ export function AnalyticsConsent() {
     }
 
     window.dataLayer = window.dataLayer ?? [];
-    window.gtag = window.gtag ?? ((...args: unknown[]) => { window.dataLayer?.push(args); });
+    window.gtag =
+      window.gtag ??
+      ((...args: unknown[]) => {
+        window.dataLayer?.push(args);
+      });
     window.gtag("consent", "default", {
       analytics_storage: "granted",
       ad_storage: "granted",
@@ -75,10 +83,19 @@ export function AnalyticsConsent() {
     });
     window.gtag("js", new Date());
     if (gaId) {
-      window.gtag("config", gaId, { send_page_view: false, allow_google_signals: false });
+      window.gtag("config", gaId, {
+        send_page_view: false,
+        allow_google_signals: false,
+        page_location: `${window.location.origin}${window.location.pathname}`,
+        page_referrer: safeReferrer(),
+      });
     }
     if (adsId) {
-      window.gtag("config", adsId, { send_page_view: false });
+      window.gtag("config", adsId, {
+        send_page_view: false,
+        page_location: `${window.location.origin}${window.location.pathname}`,
+        page_referrer: safeReferrer(),
+      });
     }
 
     const script = document.createElement("script");
@@ -91,6 +108,17 @@ export function AnalyticsConsent() {
   useEffect(() => {
     if (!isAdmin && choice === "granted" && window.growthlyAnalyticsReady) {
       trackEvent("page_view", { page_path: pathname });
+      if (pathname.startsWith("/portfolio"))
+        trackEvent("portfolio_visit", { page_path: pathname });
+      if (pathname === "/pricing") trackEvent("pricing_visit");
+      if (
+        [
+          "/website-development",
+          "/business-websites",
+          "/ecommerce-websites",
+        ].includes(pathname)
+      )
+        trackEvent("service_visit", { page_path: pathname });
     }
   }, [choice, isAdmin, pathname]);
 
@@ -106,17 +134,25 @@ export function AnalyticsConsent() {
   if (!hasAnalytics || choice !== "unknown") return null;
 
   return (
-    <aside className="consent-banner" aria-label="Optional analytics preferences">
+    <aside
+      className="consent-banner"
+      aria-label="Optional analytics preferences"
+    >
       <div>
         <h2>Optional analytics</h2>
         <p>
-          With your permission, we use analytics to understand which pages and actions are useful. We never send your form details to analytics. Read our{" "}
-          <Link href="/privacy">privacy notice</Link>.
+          With your permission, we use analytics to understand which pages and
+          actions are useful. We never send your form details to analytics. Read
+          our <Link href="/privacy-policy">privacy notice</Link>.
         </p>
       </div>
       <div className="consent-banner__actions">
-        <button type="button" onClick={() => choose("granted")}>Allow analytics</button>
-        <button type="button" onClick={() => choose("denied")}>No thanks</button>
+        <button type="button" onClick={() => choose("granted")}>
+          Allow analytics
+        </button>
+        <button type="button" onClick={() => choose("denied")}>
+          No thanks
+        </button>
       </div>
     </aside>
   );
@@ -124,7 +160,9 @@ export function AnalyticsConsent() {
 
 export function AnalyticsPreferencesButton() {
   const pathname = usePathname();
-  const configured = Boolean(process.env.NEXT_PUBLIC_GA4_ID || process.env.NEXT_PUBLIC_GOOGLE_ADS_ID);
+  const configured = Boolean(
+    process.env.NEXT_PUBLIC_GA4_ID || process.env.NEXT_PUBLIC_GOOGLE_ADS_ID,
+  );
   if (!configured || pathname?.startsWith("/admin")) return null;
   return (
     <button

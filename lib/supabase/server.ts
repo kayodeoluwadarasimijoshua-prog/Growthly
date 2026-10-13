@@ -5,11 +5,17 @@ import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 export function hasSupabaseAuthConfig() {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
 }
 
 export function hasSupabaseLeadStoreConfig() {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
 }
 
 export function hasSupabaseConfig() {
@@ -19,7 +25,8 @@ export function hasSupabaseConfig() {
 export async function createSupabaseServerClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) throw new Error("Supabase public auth configuration is missing.");
+  if (!url || !anonKey)
+    throw new Error("Supabase public auth configuration is missing.");
 
   const cookieStore = await cookies();
   return createServerClient(url, anonKey, {
@@ -36,7 +43,9 @@ export async function createSupabaseServerClient() {
       },
       setAll(cookiesToSet) {
         try {
-          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options),
+          );
         } catch {
           // Server components can read cookies but cannot write them. Route handlers can refresh them.
         }
@@ -48,9 +57,14 @@ export async function createSupabaseServerClient() {
 export function createSupabaseLeadWriter() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRoleKey) throw new Error("Supabase lead storage is not configured.");
+  if (!url || !serviceRoleKey)
+    throw new Error("Supabase lead storage is not configured.");
 
   return createClient(url, serviceRoleKey, {
-    auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
   });
 }

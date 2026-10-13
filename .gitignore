@@ -30,3 +30,8 @@ pnpm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# QA output (regenerate locally)
+/artifacts/
+/test-results/
+/playwright-report/
