@@ -6,7 +6,11 @@ import Link from "next/link";
 export function ProjectCard({ project }: { project: ProjectConcept }) {
   return (
     <article className="project-card">
-      <Link className="project-card__visual" href={`/work/${project.slug}`} aria-label={`Read the ${project.name} concept case study`}>
+      <Link
+        className="project-card__visual"
+        href={`/portfolio/${project.slug}`}
+        aria-label={`Self-initiated concept: read the ${project.name} case study`}
+      >
         <Image
           src={project.image}
           alt={project.imageAlt}
@@ -20,7 +24,7 @@ export function ProjectCard({ project }: { project: ProjectConcept }) {
         <div className="project-card__meta">{project.category}</div>
         <h3>{project.name}</h3>
         <p>{project.summary}</p>
-        <Link className="text-link" href={`/work/${project.slug}`}>
+        <Link className="text-link" href={`/portfolio/${project.slug}`}>
           Explore the concept <ArrowUpRight size={16} aria-hidden="true" />
         </Link>
       </div>

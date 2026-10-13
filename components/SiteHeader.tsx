@@ -9,9 +9,10 @@ import { trackEvent } from "@/lib/analytics";
 
 const navigation = [
   { label: "Home", href: "/" },
-  { label: "Services", href: "/services" },
-  { label: "Our Work", href: "/work" },
+  { label: "Website Development", href: "/website-development" },
+  { label: "Our Work", href: "/portfolio" },
   { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function SiteHeader() {
@@ -24,7 +25,15 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="site-header">
+    <header
+      className="site-header"
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && open) {
+          setOpen(false);
+          document.querySelector<HTMLButtonElement>(".menu-toggle")?.focus();
+        }
+      }}
+    >
       <div className="container header-inner">
         <Brand />
         <nav
@@ -45,18 +54,22 @@ export function SiteHeader() {
           ))}
           <Link
             className="mobile-nav-cta button button--primary button--small"
-            href="/start-project"
+            href="/request-a-quote"
             onClick={() => {
               setOpen(false);
-              trackEvent("service_cta_click");
+              trackEvent("quote_cta_click");
             }}
           >
-            Start a project <ArrowRight size={16} aria-hidden="true" />
+            Get a Website Quote <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </nav>
         <div className="header-actions">
-          <Link className="button button--primary button--small" href="/start-project" onClick={() => trackEvent("service_cta_click")}>
-            Start a project <ArrowRight size={16} aria-hidden="true" />
+          <Link
+            className="button button--primary button--small"
+            href="/request-a-quote"
+            onClick={() => trackEvent("quote_cta_click")}
+          >
+            Get a Website Quote <ArrowRight size={16} aria-hidden="true" />
           </Link>
           <button
             className="menu-toggle"
@@ -66,7 +79,11 @@ export function SiteHeader() {
             aria-label={open ? "Close navigation menu" : "Open navigation menu"}
             onClick={() => setOpen((current) => !current)}
           >
-            {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+            {open ? (
+              <X size={20} aria-hidden="true" />
+            ) : (
+              <Menu size={20} aria-hidden="true" />
+            )}
           </button>
         </div>
       </div>

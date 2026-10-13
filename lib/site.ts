@@ -2,16 +2,20 @@ import { business } from "@/config/business";
 
 export function getSiteUrl() {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  return configured ? configured.replace(/\/$/, "") : undefined;
+  return configured ? configured.replace(/\/$/, "") : "https://growthly.com.ng";
 }
 
 export function toInternationalPhoneNumber(number: string) {
   const digits = number.replace(/\D/g, "");
-  const international = digits.startsWith("0") ? `234${digits.slice(1)}` : digits;
+  const international = digits.startsWith("0")
+    ? `234${digits.slice(1)}`
+    : digits;
   return `+${international}`;
 }
 
-export function getWhatsAppUrl(message = "Hello GROWTHLY, I’d like to discuss a project.") {
+export function getWhatsAppUrl(
+  message = "Hello GROWTHLY, I’d like a website quote for my business.",
+) {
   return `https://wa.me/${toInternationalPhoneNumber(business.contact.whatsapp).replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
 }
 

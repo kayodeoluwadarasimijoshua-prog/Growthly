@@ -43,7 +43,13 @@ type TrackedAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   eventParams?: Record<string, string | number | boolean | undefined>;
 };
 
-export function TrackedAnchor({ eventName, eventParams, onClick, children, ...props }: TrackedAnchorProps) {
+export function TrackedAnchor({
+  eventName,
+  eventParams,
+  onClick,
+  children,
+  ...props
+}: TrackedAnchorProps) {
   return (
     <a
       {...props}

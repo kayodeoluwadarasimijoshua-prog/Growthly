@@ -264,33 +264,27 @@ export const projects: ProjectConcept[] = [
 export const processSteps = [
   {
     number: "01",
-    name: "Brief",
-    description: "Tell us about your business, audience and the change you want to make.",
+    name: "Tell us about your business",
+    description:
+      "Share your customers, offer and the job your website needs to do.",
   },
   {
     number: "02",
-    name: "Proposal",
-    description: "We confirm scope, deliverables, timing, exclusions and a written quote.",
+    name: "Agree the right solution",
+    description:
+      "We recommend an approach and confirm scope, price, timeline and deposit in writing.",
   },
   {
     number: "03",
-    name: "Deposit",
-    description: "You review the agreement and pay the deposit set out in the proposal.",
+    name: "Design, build & test",
+    description:
+      "We create the agreed pages, review them together and check the enquiry journey.",
   },
   {
     number: "04",
-    name: "Creation",
-    description: "We develop the agreed work and share progress at the planned checkpoints.",
-  },
-  {
-    number: "05",
-    name: "Review",
-    description: "You give consolidated feedback within the included revision rounds.",
-  },
-  {
-    number: "06",
-    name: "Delivery",
-    description: "We hand over the agreed files or site and note any next-step support.",
+    name: "Approve & launch",
+    description:
+      "After approval and agreed payment milestones, we launch and hand over the website.",
   },
 ] as const;
 
@@ -298,7 +292,7 @@ export const faqs = [
   {
     question: "How much does a project cost?",
     answer:
-      "The published fixed prices are only for the three graphic-designer portfolio website packages shown on this site. Other services are quoted after a brief because the deliverables vary. The written proposal confirms what is included, excluded and payable separately.",
+      "Website solutions are quotation-based because pages, content and integrations vary. The written proposal confirms what is included, excluded and payable separately.",
   },
   {
     question: "How do payments work?",
@@ -308,12 +302,12 @@ export const faqs = [
   {
     question: "How many revisions are included?",
     answer:
-      "The revision allowance is stated in each portfolio package. For custom projects, the proposal will state the number of consolidated review rounds and how extra changes are handled.",
+      "The revision allowance is stated in your written proposal. For custom projects, the proposal will state the number of consolidated review rounds and how extra changes are handled.",
   },
   {
     question: "How long will my project take?",
     answer:
-      "Timing depends on the agreed scope and how quickly content and feedback are supplied. Portfolio package start dates and delivery timing are confirmed in writing after the brief is reviewed; custom timelines are also confirmed in your proposal.",
+      "Timing depends on the agreed scope and how quickly content and feedback are supplied. Website start dates and delivery timing are confirmed in writing after the brief is reviewed; custom timelines are also confirmed in your proposal.",
   },
   {
     question: "Do you provide a domain and hosting?",

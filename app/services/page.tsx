@@ -20,11 +20,16 @@ export default function ServicesPage() {
           <div>
             <span className="eyebrow">What we do</span>
             <h1>Practical digital support, shaped around your business.</h1>
-            <p>Start with the challenge you have. We’ll agree the right scope, what it takes and what can wait.</p>
+            <p>
+              Start with the challenge you have. We’ll agree the right scope,
+              what it takes and what can wait.
+            </p>
           </div>
           <div className="page-hero__aside">
             <strong>No one-size-fits-all bundle.</strong>
-            Every project begins with a short brief. The proposal confirms deliverables, timing, revision rounds and any third-party costs before work starts.
+            Every project begins with a short brief. The proposal confirms
+            deliverables, timing, revision rounds and any third-party costs
+            before work starts.
           </div>
         </div>
       </section>
@@ -36,24 +41,44 @@ export default function ServicesPage() {
             description="Each service page explains who it is for, what a project can include and what is scoped separately."
           />
           <div className="service-catalogue">
-            {services.map((service, index) => (
-              <article className="service-catalogue__item" key={service.slug}>
-                <span className="service-catalogue__number">{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <h2>{service.title}</h2>
-                  <p>{service.summary}</p>
-                </div>
-                <span aria-hidden="true" />
-                <Link className="text-link" href={`/services/${service.slug}`}>
-                  Service details <ArrowRight size={16} aria-hidden="true" />
-                </Link>
-              </article>
-            ))}
+            {[...services]
+              .sort(
+                (a, b) =>
+                  Number(b.slug === "website-development") -
+                  Number(a.slug === "website-development"),
+              )
+              .map((service, index) => (
+                <article className="service-catalogue__item" key={service.slug}>
+                  <span className="service-catalogue__number">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h2>{service.title}</h2>
+                    <p>{service.summary}</p>
+                  </div>
+                  <span aria-hidden="true" />
+                  <Link
+                    className="text-link"
+                    href={
+                      service.slug === "website-development"
+                        ? "/website-development"
+                        : `/services/${service.slug}`
+                    }
+                  >
+                    Service details <ArrowRight size={16} aria-hidden="true" />
+                  </Link>
+                </article>
+              ))}
           </div>
         </div>
       </section>
       <section className="section section--soft section--compact">
-        <div className="container"><ClosingCTA title="Not sure which service fits?" description="Tell us what feels stuck. We’ll review the brief and help you identify a sensible next step." /></div>
+        <div className="container">
+          <ClosingCTA
+            title="Not sure which service fits?"
+            description="Tell us what feels stuck. We’ll review the brief and help you identify a sensible next step."
+          />
+        </div>
       </section>
     </>
   );

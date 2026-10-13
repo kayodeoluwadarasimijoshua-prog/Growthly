@@ -18,8 +18,15 @@ export const metadata: Metadata = {
   applicationName: business.name,
   category: "business",
   verification: process.env.GOOGLE_SITE_VERIFICATION
-    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
-    : undefined,
+    ? {
+        google: process.env.GOOGLE_SITE_VERIFICATION,
+        other: process.env.BING_SITE_VERIFICATION
+          ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION }
+          : undefined,
+      }
+    : process.env.BING_SITE_VERIFICATION
+      ? { other: { "msvalidate.01": process.env.BING_SITE_VERIFICATION } }
+      : undefined,
   openGraph: {
     type: "website",
     siteName: business.name,
@@ -31,7 +38,7 @@ export const metadata: Metadata = {
     title: `${business.name} — ${business.tagline}`,
     description: business.description,
   },
-  robots: { index: true, follow: true },
+  robots: { index: process.env.SITE_INDEXING_ENABLED === "true", follow: true },
 };
 
 export const viewport: Viewport = {
@@ -61,16 +68,33 @@ function OrganizationSchema() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            schema,
+            {
+              "@type": "WebSite",
+              name: business.name,
+              url: siteUrl,
+              description: business.description,
+            },
+          ],
+        }).replace(/</g, "\\u003c"),
+      }}
     />
   );
 }
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body>
-        <a className="skip-link" href="#main-content">Skip to content</a>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
         <SiteHeader />
         <main id="main-content">{children}</main>
         <SiteFooter />

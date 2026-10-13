@@ -1,163 +1,143 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check, Compass, FileCheck2, MessageSquareText, PenTool } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
+import { pageMetadata } from "@/lib/seo";
+import { StartProjectLink } from "@/components/ContactLinks";
 import { HeroArtwork } from "@/components/HeroArtwork";
-import { ProjectCard } from "@/components/ProjectCard";
 import { SectionHeading } from "@/components/SectionHeading";
-import { ServiceRow } from "@/components/ServiceRow";
+import {
+  Solutions,
+  WorkPreview,
+  WebsiteFAQ,
+  IndustriesList,
+  Standards,
+  WhyGrowthly,
+} from "@/components/WebsiteSections";
 import { ProcessSteps } from "@/components/ProcessSteps";
 import { PackageGrid } from "@/components/PackageGrid";
-import { FAQList } from "@/components/FAQList";
 import { ClosingCTA } from "@/components/ClosingCTA";
-import { StartProjectLink } from "@/components/ContactLinks";
-import { services, projects } from "@/config/content";
-import { pageMetadata } from "@/lib/seo";
-
-const homeMetadata = pageMetadata(
-  "Digital services for growing Nigerian businesses",
-  "Professional graphic design, websites, AI-assisted video and practical marketing support for Nigerian small businesses and growing brands.",
+export const metadata = pageMetadata(
+  "Website development for Nigerian businesses",
+  "Get a professional business website, online store or landing page from Growthly. Explore original website concepts and request a scoped quote.",
   "/",
 );
-
-export const metadata: Metadata = {
-  ...homeMetadata,
-  title: "Digital services for growing Nigerian businesses | GROWTHLY",
-};
-
-const principles = [
-  {
-    icon: MessageSquareText,
-    title: "Clear communication",
-    text: "You know what happens next, what we need from you and who to contact throughout the project.",
-  },
-  {
-    icon: FileCheck2,
-    title: "Defined deliverables",
-    text: "The written scope names what is included, the review rounds, timing and costs that sit outside it.",
-  },
-  {
-    icon: Compass,
-    title: "Practical choices",
-    text: "Recommendations start with your business goals and current setup—not a tool or trend looking for a use.",
-  },
-];
-
 export default function HomePage() {
   return (
     <>
-      <section className="home-hero">
+      <section className="hero website-hero">
         <div className="container hero-grid">
           <div className="hero-copy">
-            <span className="eyebrow">Creative support for growing businesses</span>
-            <h1>Your business has potential. <em>Let’s help it grow.</em></h1>
-            <p className="lede">
-              Professional design, websites and marketing solutions built around your business goals.
+            <span className="eyebrow">
+              <span className="status-dot" /> Website development for Nigerian
+              businesses
+            </span>
+            <h1>
+              Your business deserves more than just <em>social media.</em>
+            </h1>
+            <p>
+              Get a professional website that helps customers discover your
+              business, explore your products or services, and contact you with
+              confidence.
             </p>
             <div className="hero-actions">
-              <StartProjectLink label="Start your project" />
-              <Link className="button button--outline" href="/work">
-                View our work <ArrowRight size={16} aria-hidden="true" />
+              <StartProjectLink />
+              <Link className="button button--outline" href="/portfolio">
+                View Our Work <ArrowRight size={17} aria-hidden="true" />
               </Link>
             </div>
-            <div className="hero-proof" aria-label="How GROWTHLY works">
-              <span><Check size={14} aria-hidden="true" /> Clear scope</span>
-              <span><Check size={14} aria-hidden="true" /> Thoughtful execution</span>
-              <span><Check size={14} aria-hidden="true" /> Human communication</span>
+            <div className="hero-assurances">
+              <span>
+                <Check size={15} aria-hidden="true" /> Clear scope
+              </span>
+              <span>
+                <Check size={15} aria-hidden="true" /> Mobile-first
+              </span>
+              <span>
+                <Check size={15} aria-hidden="true" /> Built around your
+                business
+              </span>
             </div>
           </div>
           <HeroArtwork />
         </div>
       </section>
-
-      <section className="section section--soft">
-        <div className="container">
-          <SectionHeading
-            eyebrow="Selected creative concepts"
-            title="Thoughtful ideas, made tangible."
-            description="These self-initiated concepts show the kind of design thinking GROWTHLY can bring to a project. They are clearly labelled sample work—not commissioned client projects."
-            action={<Link className="text-link" href="/work">Explore all concepts <ArrowRight size={16} aria-hidden="true" /></Link>}
-          />
-          <div className="project-grid">
-            {projects.map((project) => <ProjectCard key={project.slug} project={project} />)}
-          </div>
-          <div className="concept-note mt-32">
-            <PenTool size={17} aria-hidden="true" />
-            <span>GROWTHLY is building its commissioned portfolio. Each project shown today is an original, self-initiated concept; no client results or project histories are implied.</span>
-          </div>
-        </div>
-      </section>
-
+      <div className="container">
+        <Standards />
+      </div>
       <section className="section">
         <div className="container">
           <SectionHeading
-            eyebrow="What we can help with"
-            title="The right support for your next step."
-            description="Choose one service or bring us a broader brief. We’ll confirm the deliverables and fit before recommending a way forward."
-            action={<Link className="text-link" href="/services">See all services <ArrowRight size={16} aria-hidden="true" /></Link>}
+            eyebrow="Your next step online"
+            title="The right website for the way you do business."
+            description="From a simple business presence to an online store, we shape the website around your offer, your customers and your next stage."
           />
-          <div className="service-list">
-            {services.map((service, index) => <ServiceRow key={service.slug} service={service} index={index} />)}
+          <Solutions />
+          <div className="secondary-services">
+            <span>Need more than a website?</span>
+            <p>
+              AI video adverts · Graphic design · Social media management ·
+              Digital advertising
+            </p>
+            <Link className="text-link" href="/services">
+              Explore supporting services{" "}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>
-
+      <WorkPreview />
       <section className="section section--mint">
         <div className="container">
-          <div className="why-grid">
-            <div className="why-grid__intro">
-              <span className="eyebrow">A thoughtful partner</span>
-              <h2>Good work starts with a clear brief.</h2>
-              <p>
-                GROWTHLY brings creative and practical digital support together. We keep the conversation direct, the scope visible and the next step easy to understand.
-              </p>
-            </div>
-            <div className="principle-list">
-              {principles.map(({ icon: Icon, title, text }) => (
-                <article className="principle" key={title}>
-                  <span className="principle__icon"><Icon size={17} aria-hidden="true" /></span>
-                  <div><h3>{title}</h3><p>{text}</p></div>
-                </article>
-              ))}
-            </div>
-          </div>
+          <WhyGrowthly />
         </div>
       </section>
-
       <section className="section">
         <div className="container">
           <SectionHeading
-            eyebrow="A simple, shared process"
-            title="From first conversation to final handover."
-            description="We agree the work before it starts, then make room for useful feedback at the right moments."
+            eyebrow="From brief to launch"
+            title="A clear process. No guessing what comes next."
+            description="We agree the scope before we build. Timelines depend on content readiness, revisions and the integrations your project needs."
           />
           <ProcessSteps />
-          <div className="mt-32"><StartProjectLink label="Tell us about your project" /></div>
         </div>
       </section>
-
-      <section className="section section--soft" id="pricing">
+      <section className="section section--soft">
         <div className="container">
           <PackageGrid heading />
-          <p className="form-fineprint mt-24">
-            Looking for graphic design, video, social media, advertising or automation? Those services are quoted separately from a brief; these package prices do not apply to them.
-          </p>
+          <div className="mt-24">
+            <Link className="text-link" href="/pricing">
+              Understand packages & separate costs{" "}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
         </div>
       </section>
-
       <section className="section">
+        <div className="container">
+          <SectionHeading
+            eyebrow="Different businesses. Practical solutions."
+            title="A website that speaks your customers’ language."
+            description="These are possible website applications, not claims of specialist client experience."
+          />
+          <IndustriesList />
+        </div>
+      </section>
+      <section className="section section--soft">
         <div className="container faq-layout">
           <div className="faq-layout__intro">
-            <span className="eyebrow">Good to know</span>
-            <h2>Before we begin.</h2>
-            <p>Clear answers now make the first conversation easier.</p>
-            <Link className="text-link mt-24" href="/contact">Ask a different question <ArrowRight size={16} aria-hidden="true" /></Link>
+            <span className="eyebrow">Good questions, honest answers</span>
+            <h2>Before you invest in a website.</h2>
+            <p>Know what’s involved, what’s separate and how to get started.</p>
+            <Link className="text-link mt-24" href="/contact">
+              Ask us a question <ArrowRight size={16} aria-hidden="true" />
+            </Link>
           </div>
-          <FAQList />
+          <WebsiteFAQ />
         </div>
       </section>
-
       <section className="section section--compact">
-        <div className="container"><ClosingCTA /></div>
+        <div className="container">
+          <ClosingCTA />
+        </div>
       </section>
     </>
   );

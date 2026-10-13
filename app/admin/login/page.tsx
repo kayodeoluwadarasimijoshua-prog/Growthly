@@ -19,8 +19,14 @@ export default async function AdminLoginPage() {
         <div className="admin-login__card">
           <Brand />
           <h1>Admin setup required</h1>
-          <p>The private lead dashboard is not available until Supabase authentication, the lead table and server-only keys are configured. Follow the setup instructions in <code>README.md</code>.</p>
-          <p className="form-fineprint" style={{ marginTop: 18 }}>Do not add credentials to source files or send them in chat.</p>
+          <p>
+            The private lead dashboard is not available until Supabase
+            authentication, the lead table and server-only keys are configured.
+            Follow the setup instructions in <code>README.md</code>.
+          </p>
+          <p className="form-fineprint" style={{ marginTop: 18 }}>
+            Do not add credentials to source files or send them in chat.
+          </p>
         </div>
       </section>
     );
@@ -29,9 +35,10 @@ export default async function AdminLoginPage() {
   const auth = await getAdminContext();
   if (auth.ok) redirect("/admin");
 
-  const message = auth.reason === "forbidden"
-    ? "This signed-in account does not have the GROWTHLY administrator role. Sign in with an authorised admin account."
-    : undefined;
+  const message =
+    auth.reason === "forbidden"
+      ? "This signed-in account does not have the GROWTHLY administrator role. Sign in with an authorised admin account."
+      : undefined;
 
   return (
     <section className="container admin-login">
