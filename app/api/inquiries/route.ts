@@ -1,8 +1,17 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { createHash } from "node:crypto";
+import { providerFetch } from "@/lib/provider-fetch";
+import {
+  readBoundedJson,
+  BodyTooLargeError,
+  BodyReadTimeoutError,
+} from "@/lib/bounded-json";
+import type { NextRequest } from "next/server";
+import { privateJson } from "@/lib/api-response";
 import { budgetOptions } from "@/config/business";
 import { services } from "@/config/content";
 import { validateInquiry } from "@/lib/inquiries";
-import { checkRateLimit, requestIp } from "@/lib/rate-limit";
+import { requestIp } from "@/lib/rate-limit";
+import { checkApiRateLimit } from "@/lib/api-rate-limit";
 import { isSameOriginRequest } from "@/lib/request-security";
 import {
   createSupabaseLeadWriter,
@@ -56,18 +65,19 @@ function leadEmailText(lead: {
   ].join("\n");
 }
 
-async function sendLeadEmail(text: string) {
+async function sendLeadEmail(text: string, key?: string | null) {
   const apiKey = process.env.RESEND_API_KEY;
   const destination = process.env.LEADS_EMAIL;
   const from = process.env.RESEND_FROM_EMAIL;
   if (!apiKey || !destination || !from) return false;
 
   try {
-    const response = await fetch("https://api.resend.com/emails", {
+    const response = await providerFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
+        ...(key ? { "Idempotency-Key": `growthly-enquiry/${key}` } : {}),
       },
       body: JSON.stringify({
         from,
@@ -84,7 +94,7 @@ async function sendLeadEmail(text: string) {
     const receipt = (await response.json().catch(() => null)) as {
       id?: string;
     } | null;
-    return Boolean(receipt?.id);
+    return typeof receipt?.id === "string" && receipt.id.trim().length > 0;
   } catch {
     console.error("Lead email delivery failed");
     return false;
@@ -93,16 +103,25 @@ async function sendLeadEmail(text: string) {
 
 export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
-    return NextResponse.json(
+    return privateJson(
       { message: "This request could not be accepted." },
       { status: 403 },
     );
   }
 
   const ip = requestIp(request);
-  const limit = checkRateLimit(`inquiry:${ip}`, 5, 10 * 60 * 1000);
+  const limit = await checkApiRateLimit(`inquiry:${ip}`, 5, 10 * 60 * 1000);
+  if ("unavailable" in limit && limit.unavailable) {
+    return privateJson(
+      {
+        message:
+          "The service is temporarily unavailable. Please try again later.",
+      },
+      { status: 503, headers: { "Retry-After": "60" } },
+    );
+  }
   if (!limit.allowed) {
-    return NextResponse.json(
+    return privateJson(
       {
         message:
           "Too many requests from this connection. Please wait a few minutes or contact GROWTHLY directly.",
@@ -114,22 +133,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const declaredLength = Number(request.headers.get("content-length") ?? "0");
-  if (declaredLength > MAX_BODY_BYTES) {
-    return NextResponse.json(
-      {
-        message:
-          "The request is too large. Please shorten your brief and try again.",
-      },
-      { status: 413 },
-    );
-  }
-
   let input: unknown;
   try {
-    const body = await request.text();
-    if (new TextEncoder().encode(body).byteLength > MAX_BODY_BYTES) {
-      return NextResponse.json(
+    input = await readBoundedJson(request, MAX_BODY_BYTES);
+  } catch (error) {
+    if (error instanceof BodyReadTimeoutError)
+      return privateJson(
+        {
+          message:
+            "The upload took too long. Please retry on a stable connection.",
+        },
+        { status: 408 },
+      );
+    if (error instanceof BodyTooLargeError) {
+      return privateJson(
         {
           message:
             "The request is too large. Please shorten your brief and try again.",
@@ -137,9 +154,7 @@ export async function POST(request: NextRequest) {
         { status: 413 },
       );
     }
-    input = JSON.parse(body);
-  } catch {
-    return NextResponse.json(
+    return privateJson(
       { message: "Please check the form and try again." },
       { status: 400 },
     );
@@ -147,7 +162,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = validateInquiry(input);
   if (!parsed.success) {
-    return NextResponse.json(
+    return privateJson(
       {
         message:
           "Check the required fields and contact details, then try again.",
@@ -155,10 +170,37 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
+  if (process.env.ONLINE_INQUIRIES_ENABLED !== "true")
+    return privateJson(
+      {
+        message:
+          "Online enquiry delivery is not enabled. Please contact Growthly through WhatsApp.",
+      },
+      { status: 503 },
+    );
+  const idempotency = process.env.INQUIRY_IDEMPOTENCY_ENABLED === "true";
+  const key = request.headers.get("idempotency-key");
+  if (
+    (key &&
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        key,
+      )) ||
+    (idempotency && !key)
+  ) {
+    return privateJson(
+      { message: "Please refresh the form and try again." },
+      { status: 400 },
+    );
+  }
+  const fingerprint = createHash("sha256")
+    .update(JSON.stringify(parsed.data))
+    .digest("hex");
   const lead = parsed.data;
   // Keep the existing database schema: optional requirements form part of the private brief.
   lead.brief = [
-    `Website type: ${lead.website_type}`,
+    lead.service === "website-development"
+      ? `Website type: ${lead.website_type}`
+      : "",
     lead.existing_url ? `Existing URL: ${lead.existing_url}` : "",
     lead.industry ? `Industry: ${lead.industry}` : "",
     lead.required_features ? `Features: ${lead.required_features}` : "",
@@ -169,7 +211,7 @@ export async function POST(request: NextRequest) {
     .filter(Boolean)
     .join("\n");
   if (lead.website.trim()) {
-    return NextResponse.json(
+    return privateJson(
       {
         message:
           "This request could not be accepted. Please check the form and try again.",
@@ -181,8 +223,8 @@ export async function POST(request: NextRequest) {
   const emailText = leadEmailText(lead);
   const emailConfigured = Boolean(
     process.env.RESEND_API_KEY &&
-      process.env.LEADS_EMAIL &&
-      process.env.RESEND_FROM_EMAIL,
+    process.env.LEADS_EMAIL &&
+    process.env.RESEND_FROM_EMAIL,
   );
   let saved = false;
 
@@ -202,7 +244,30 @@ export async function POST(request: NextRequest) {
         preferred_deadline: lead.preferred_deadline,
         attribution: lead.attribution,
         status: "new",
+        ...(idempotency
+          ? { submission_id: key, submission_hash: fingerprint }
+          : {}),
       });
+      if (error?.code === "23505" && idempotency) {
+        const existing = await supabase
+          .from("inquiries")
+          .select("submission_hash")
+          .eq("submission_id", key!)
+          .maybeSingle();
+        if (!existing.error && existing.data) {
+          if (existing.data.submission_hash !== fingerprint) {
+            return privateJson(
+              {
+                message:
+                  "This submission reference has already been used. Please refresh the form.",
+              },
+              { status: 409 },
+            );
+          }
+          // A stored retry is acknowledged without creating another row or notification.
+          return privateJson({ ok: true }, { status: 200 });
+        }
+      }
       if (error) {
         console.error("Inquiry persistence failed", error.code ?? "unknown");
       } else {
@@ -214,21 +279,27 @@ export async function POST(request: NextRequest) {
   }
 
   if (saved) {
-    if (emailConfigured) await sendLeadEmail(emailText);
-    return NextResponse.json(
+    if (emailConfigured) await sendLeadEmail(emailText, key);
+    return privateJson(
       { ok: true },
       { status: 201, headers: { "Cache-Control": "no-store" } },
     );
   }
 
-  if (emailConfigured && (await sendLeadEmail(emailText))) {
-    return NextResponse.json(
+  // In idempotent database mode, an unknown write outcome must not silently
+  // switch channels. Retrying the same key safely discovers a committed row.
+  if (
+    !(idempotency && hasSupabaseLeadStoreConfig()) &&
+    emailConfigured &&
+    (await sendLeadEmail(emailText, key))
+  ) {
+    return privateJson(
       { ok: true },
       { status: 201, headers: { "Cache-Control": "no-store" } },
     );
   }
 
-  return NextResponse.json(
+  return privateJson(
     {
       message:
         "The inquiry service is not available right now. Your request was not confirmed. Please contact GROWTHLY on WhatsApp or phone instead.",

@@ -1,34 +1,9 @@
 import { ImageResponse } from "next/og";
+import { GrowthlyMark } from "@/components/GrowthlyMark";
 
 export const alt = "GROWTHLY — Helping Businesses Scale Up.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-
-function BrandMark({ size: markSize = 44 }: { size?: number }) {
-  return (
-    <svg width={markSize} height={markSize} viewBox="0 0 40 40" fill="none">
-      <rect
-        x="1"
-        y="1"
-        width="38"
-        height="38"
-        rx="12"
-        fill="#0F9D6B"
-        opacity=".12"
-      />
-      <path
-        d="M10 25.6c4.1-.1 7.1-2.6 8.2-7.5 4.9.5 8.8-1.7 11.5-6.4 1.1 6.7-.9 13.4-6 17.1-4.1 3-9.4 2.7-13.7-1.4Z"
-        fill="#0F9D6B"
-      />
-      <path
-        d="M11 29c4.5-4.3 8.9-8 15.5-13"
-        stroke="#FBFCFA"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 export default function OpenGraphImage() {
   return new ImageResponse(
@@ -50,7 +25,7 @@ export default function OpenGraphImage() {
           style={{ display: "flex", flexDirection: "column", width: "760px" }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <BrandMark />
+            <GrowthlyMark size={44} id="og-small" />
             <div
               style={{
                 fontSize: "22px",
@@ -120,7 +95,7 @@ export default function OpenGraphImage() {
             background: "#ddf5e9",
           }}
         >
-          <BrandMark size={96} />
+          <GrowthlyMark size={96} id="og-large" />
         </div>
       </div>
     ),

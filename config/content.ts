@@ -1,3 +1,11 @@
+import projectImages from "@/config/project-images.json";
+import {
+  readProjectImage,
+  isProjectImageReviewEnabled,
+  type ProjectImage,
+} from "@/lib/project-images";
+import { websitePriceSummary, websiteHostingOffer } from "@/config/business";
+
 export type ServiceDefinition = {
   slug: string;
   title: string;
@@ -57,7 +65,7 @@ export const services: ServiceDefinition[] = [
     workingStyle:
       "We confirm the page list, content responsibilities, integrations and hosting approach before quoting. The site is reviewed on common mobile and desktop sizes before handover.",
     boundaries: [
-      "Domain registration, hosting, paid themes and third-party subscriptions are not included unless listed in the proposal.",
+      "Website packages include the approved first-year .com.ng domain and hosting offer. Renewals, paid themes and third-party subscriptions are separate unless listed in the proposal.",
       "Copywriting, e-commerce, booking and custom integrations require explicit scoping.",
       "Ongoing maintenance is separate from a one-time build unless agreed in writing.",
     ],
@@ -164,100 +172,64 @@ export const services: ServiceDefinition[] = [
   },
 ];
 
-export type ProjectConcept = {
+export type ClientProject = {
+  kind: "client" | "demonstration";
+  service?: string;
+  featured?: boolean;
+  videoUrl?: string;
   slug: string;
   name: string;
   category: string;
-  image: string;
-  imageAlt: string;
+  liveUrl: string;
+  previewSummary: string;
+  image?: Omit<ProjectImage, "kind"> & {
+    kind: ProjectImage["kind"] | "artwork";
+  };
   services: string[];
   summary: string;
-  concept: string;
+  overview: string;
   creativeIntent: string;
   designChoices: string[];
   scope: string[];
   note: string;
 };
-
-/** All current portfolio entries are clearly identified as self-initiated concepts. */
-export const projects: ProjectConcept[] = [
+export type PortfolioProject = ClientProject;
+/** Only owner-approved published projects. Removed demos and Daily Life Review are not public work. */
+export const projects: PortfolioProject[] = [
   {
-    slug: "kora-botanics",
-    name: "Kora Botanics",
-    category: "Retail · Brand & landing-page concept",
-    image: "/images/kora-botanics.svg",
-    imageAlt:
-      "Self-initiated Kora Botanics concept: a calm green skincare landing page beside a botanical product bottle.",
-    services: ["Graphic design", "Website design & development"],
+    kind: "client",
+    slug: "starxco",
+    name: "StarXCO",
+    category: "Energy, maritime & trade · Business website",
+    liveUrl: "https://starxco.com.ng/",
+    // A genuine image is enabled only after the owner's approved local import.
+    image: readProjectImage(
+      (projectImages as Record<string, unknown>).starxco,
+      "starxco",
+      isProjectImageReviewEnabled(),
+    ),
+    previewSummary:
+      "Commercial facilitation across energy, maritime, logistics & trade.",
+    services: ["Website development"],
     summary:
-      "A product-first storefront concept for a fictional botanical skincare label.",
-    concept:
-      "Kora Botanics is a self-initiated concept, not a commissioned client project. It explores how a small product range might be introduced through a calm, direct visual system.",
+      "A business website presenting commercial facilitation services across energy, maritime, logistics and trade.",
+    overview:
+      "StarXCO connects commercial participants across energy, maritime, transport and commodity markets. Its website brings the company introduction, service information, working process and enquiry options into one place. This is a Growthly website-development project.",
     creativeIntent:
-      "Make the product and its everyday use the first thing a visitor understands, while keeping the path to explore or enquire uncomplicated.",
+      "Help visitors understand what StarXCO facilitates, find a relevant service and provide the details of a commercial requirement.",
     designChoices: [
-      "A soft, natural palette gives the product room without leaning on decorative clutter.",
-      "A simple product feature panel keeps the message, ingredient story and action together.",
-      "A compact set of campaign assets carries the same visual language beyond the page.",
+      "A company introduction explains its role as a commercial facilitator and intermediary.",
+      "Dedicated service and sector pages organise the offer around the visitor’s requirements.",
+      "A visible working process explains how a requirement moves from assessment through coordination to execution.",
+      "Contact and quote-request pages give visitors a clear next step.",
     ],
     scope: [
-      "Exploratory art direction and product-label layout",
-      "Responsive landing-page concept",
-      "Sample campaign graphics and product presentation",
+      "Business website with company, service and sector information",
+      "Process and documentation information pages",
+      "Requirement form covering product, vessel, equipment, origin, destination and timing details",
+      "Contact and enquiry pathways",
     ],
-    note: "Fictional brand and self-initiated concept. No sales, client history or performance results are implied.",
-  },
-  {
-    slug: "abeni-stay",
-    name: "Abeni Stay",
-    category: "Hospitality · Website concept",
-    image: "/images/abeni-stay.svg",
-    imageAlt:
-      "Self-initiated Abeni Stay concept: a warm, editorial guesthouse landing page with a simple room enquiry panel.",
-    services: ["Website design & development", "Graphic design"],
-    summary:
-      "A hospitality website concept built around a welcoming first impression and a clear enquiry route.",
-    concept:
-      "Abeni Stay is a fictional guesthouse concept created to demonstrate a possible hospitality website direction. It is not a real property or client engagement.",
-    creativeIntent:
-      "Let a visitor get a feel for the place, scan the key stay details and make an enquiry without having to work through a complicated booking flow.",
-    designChoices: [
-      "Warm, architectural forms give the page a sense of place without relying on stock photography.",
-      "Short sections separate the welcome, room highlights and enquiry action.",
-      "A direct enquiry route is used instead of implying a live booking system.",
-    ],
-    scope: [
-      "Hospitality brand direction for the concept",
-      "Responsive homepage and room-enquiry flow concept",
-      "Sample information hierarchy for stay details",
-    ],
-    note: "Fictional hospitality concept. The enquiry panel is illustrative and does not accept bookings.",
-  },
-  {
-    slug: "ayo-studio",
-    name: "Ayo Studio",
-    category: "Creative services · Portfolio concept",
-    image: "/images/ayo-studio.svg",
-    imageAlt:
-      "Self-initiated Ayo Studio concept: a bold creative portfolio layout with a typographic project grid.",
-    services: ["Website design & development", "Graphic design"],
-    summary:
-      "A portfolio concept for a fictional multidisciplinary creative, balancing personality with clear project browsing.",
-    concept:
-      "Ayo Studio is a self-initiated sample concept, not a real designer or client. It demonstrates how a designer’s portfolio can feel individual while remaining easy to navigate.",
-    creativeIntent:
-      "Give a visitor a quick sense of the creative point of view, then make it simple to open selected work or start a conversation.",
-    designChoices: [
-      "A high-contrast editorial layout gives the work a clear frame.",
-      "Project labels are visible before opening a case study, reducing guesswork.",
-      "A compact project grid adapts to smaller screens without hiding the work.",
-    ],
-    scope: [
-      "Portfolio information architecture concept",
-      "Responsive creative portfolio page direction",
-      "Sample case-study and contact layouts",
-    ],
-    note: "Fictional creative portfolio concept. No client work or business results are represented.",
+    note: "The live website may change over time. No traffic, revenue or enquiry-growth results are claimed; the external form’s delivery was not tested for this portfolio update.",
   },
 ];
 
@@ -291,8 +263,7 @@ export const processSteps = [
 export const faqs = [
   {
     question: "How much does a project cost?",
-    answer:
-      "Website solutions are quotation-based because pages, content and integrations vary. The written proposal confirms what is included, excluded and payable separately.",
+    answer: `${websitePriceSummary}. ${websiteHostingOffer.summary} Final quotes depend on pages, content and integrations. The written proposal confirms inclusions, exclusions and separate fees.`,
   },
   {
     question: "How do payments work?",
@@ -311,8 +282,7 @@ export const faqs = [
   },
   {
     question: "Do you provide a domain and hosting?",
-    answer:
-      "Domain registration and hosting are separate unless a written proposal explicitly includes them. We can agree the right setup for your project and make clear who owns each account and renewal.",
+    answer: `${websiteHostingOffer.summary} ${websiteHostingOffer.renewals}`,
   },
   {
     question: "Can you maintain my website after launch?",

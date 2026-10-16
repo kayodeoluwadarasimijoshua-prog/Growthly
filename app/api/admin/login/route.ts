@@ -1,6 +1,13 @@
-import { NextResponse, type NextRequest } from "next/server";
+import {
+  readBoundedJson,
+  BodyTooLargeError,
+  BodyReadTimeoutError,
+} from "@/lib/bounded-json";
+import type { NextRequest } from "next/server";
+import { privateJson } from "@/lib/api-response";
 import { z } from "zod";
-import { checkRateLimit, requestIp } from "@/lib/rate-limit";
+import { requestIp } from "@/lib/rate-limit";
+import { checkApiRateLimit } from "@/lib/api-rate-limit";
 import { isSameOriginRequest } from "@/lib/request-security";
 import {
   createSupabaseServerClient,
@@ -18,13 +25,13 @@ const loginSchema = z
 
 export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
-    return NextResponse.json(
+    return privateJson(
       { message: "This request could not be accepted." },
       { status: 403 },
     );
   }
   if (!hasSupabaseAuthConfig()) {
-    return NextResponse.json(
+    return privateJson(
       {
         message:
           "Admin sign-in is not configured. Complete the Supabase setup in the deployment guide.",
@@ -34,9 +41,18 @@ export async function POST(request: NextRequest) {
   }
 
   const ip = requestIp(request);
-  const limit = checkRateLimit(`admin-login:${ip}`, 5, 15 * 60 * 1000);
+  const limit = await checkApiRateLimit(`admin-login:${ip}`, 5, 15 * 60 * 1000);
+  if ("unavailable" in limit && limit.unavailable) {
+    return privateJson(
+      {
+        message:
+          "The service is temporarily unavailable. Please try again later.",
+      },
+      { status: 503, headers: { "Retry-After": "60" } },
+    );
+  }
   if (!limit.allowed) {
-    return NextResponse.json(
+    return privateJson(
       {
         message:
           "Too many sign-in attempts. Wait a little before trying again.",
@@ -48,33 +64,31 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const declaredLength = Number(request.headers.get("content-length") ?? "0");
-  if (declaredLength > 4_096) {
-    return NextResponse.json(
-      { message: "The sign-in request is too large." },
-      { status: 413 },
-    );
-  }
-
   let input: unknown;
   try {
-    const body = await request.text();
-    if (new TextEncoder().encode(body).byteLength > 4_096) {
-      return NextResponse.json(
+    input = await readBoundedJson(request, 4_096);
+  } catch (error) {
+    if (error instanceof BodyReadTimeoutError)
+      return privateJson(
+        {
+          message:
+            "The upload took too long. Please retry on a stable connection.",
+        },
+        { status: 408 },
+      );
+    if (error instanceof BodyTooLargeError)
+      return privateJson(
         { message: "The sign-in request is too large." },
         { status: 413 },
       );
-    }
-    input = JSON.parse(body);
-  } catch {
-    return NextResponse.json(
+    return privateJson(
       { message: "Enter a valid email address and password." },
       { status: 400 },
     );
   }
   const parsed = loginSchema.safeParse(input);
   if (!parsed.success) {
-    return NextResponse.json(
+    return privateJson(
       { message: "Enter a valid email address and password." },
       { status: 400 },
     );
@@ -84,14 +98,14 @@ export async function POST(request: NextRequest) {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
     if (error || !data.user) {
-      return NextResponse.json(
+      return privateJson(
         { message: "The email or password was not recognised." },
         { status: 401 },
       );
     }
     if (data.user.app_metadata?.role !== "admin") {
       await supabase.auth.signOut();
-      return NextResponse.json(
+      return privateJson(
         {
           message:
             "This account is not authorised for the GROWTHLY admin area.",
@@ -99,9 +113,9 @@ export async function POST(request: NextRequest) {
         { status: 403 },
       );
     }
-    return NextResponse.json({ ok: true });
+    return privateJson({ ok: true });
   } catch {
-    return NextResponse.json(
+    return privateJson(
       { message: "Sign-in is temporarily unavailable. Try again later." },
       { status: 503 },
     );

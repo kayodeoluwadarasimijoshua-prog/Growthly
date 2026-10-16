@@ -1,8 +1,10 @@
 "use client";
 
+import { usePublicSettings } from "@/components/PublicSiteSettings";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, MessageCircle, Phone } from "lucide-react";
 import { business } from "@/config/business";
+import { getServicePage } from "@/config/service-pages";
 import { getPhoneHref, getWhatsAppUrl } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
 
@@ -15,10 +17,15 @@ export function WhatsAppButton({
   message?: string;
   light?: boolean;
 }) {
+  const { settings, available } = usePublicSettings();
+  if (!available)
+    return (
+      <span role="status">Contact information is temporarily unavailable.</span>
+    );
   return (
     <a
       className={`button ${light ? "button--light" : "button--outline"}`}
-      href={getWhatsAppUrl(message)}
+      href={getWhatsAppUrl(message, settings.whatsapp)}
       target="_blank"
       rel="noreferrer"
       onClick={() => trackEvent("whatsapp_click")}
@@ -30,10 +37,15 @@ export function WhatsAppButton({
 }
 
 export function PhoneLink({ compact = false }: { compact?: boolean }) {
+  const { settings, available } = usePublicSettings();
+  if (!available)
+    return (
+      <span role="status">Contact information is temporarily unavailable.</span>
+    );
   return (
     <a
       className={compact ? "text-link" : "button button--outline"}
-      href={getPhoneHref(business.contact.alternativePhone)}
+      href={getPhoneHref(settings.alternativePhone)}
       onClick={() =>
         trackEvent("phone_click", { contact_type: "alternative_phone" })
       }
@@ -43,13 +55,13 @@ export function PhoneLink({ compact = false }: { compact?: boolean }) {
       ) : (
         <Phone size={16} aria-hidden="true" />
       )}
-      Call {business.contact.alternativePhone}
+      Call {settings.alternativePhone}
     </a>
   );
 }
 
 export function StartProjectLink({
-  label = "Get a Website Quote",
+  label,
   service,
   className = "button button--primary",
 }: {
@@ -58,8 +70,8 @@ export function StartProjectLink({
   className?: string;
 }) {
   const href = service
-    ? `/request-a-quote?service=${encodeURIComponent(service)}`
-    : "/request-a-quote";
+    ? `${business.primaryCTA.href}?service=${encodeURIComponent(service)}`
+    : business.primaryCTA.href;
   return (
     <Link
       className={className}
@@ -68,7 +80,8 @@ export function StartProjectLink({
         trackEvent("quote_cta_click", service ? { service } : undefined)
       }
     >
-      {label} <ArrowRight size={16} aria-hidden="true" />
+      {label ?? getServicePage(service)?.cta ?? business.primaryCTA.label}{" "}
+      <ArrowRight size={16} aria-hidden="true" />
     </Link>
   );
 }

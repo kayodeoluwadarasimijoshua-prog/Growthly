@@ -1,4 +1,10 @@
-import { NextResponse, type NextRequest } from "next/server";
+import {
+  readBoundedJson,
+  BodyTooLargeError,
+  BodyReadTimeoutError,
+} from "@/lib/bounded-json";
+import type { NextRequest } from "next/server";
+import { privateJson } from "@/lib/api-response";
 import { z } from "zod";
 import { isSameOriginRequest } from "@/lib/request-security";
 import { getAdminContext } from "@/lib/supabase/admin";
@@ -39,7 +45,7 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> },
 ) {
   if (!isSameOriginRequest(request)) {
-    return NextResponse.json(
+    return privateJson(
       { message: "This request could not be accepted." },
       { status: 403 },
     );
@@ -52,7 +58,7 @@ export async function PATCH(
         : auth.reason === "forbidden"
           ? 403
           : 401;
-    return NextResponse.json(
+    return privateJson(
       { message: "You are not authorised to update lead records." },
       { status },
     );
@@ -60,23 +66,27 @@ export async function PATCH(
 
   let body: unknown;
   try {
-    const text = await request.text();
-    if (new TextEncoder().encode(text).byteLength > 12_000)
-      return NextResponse.json(
+    body = await readBoundedJson(request, 12_000);
+  } catch (error) {
+    if (error instanceof BodyReadTimeoutError)
+      return privateJson(
+        {
+          message:
+            "The upload took too long. Please retry on a stable connection.",
+        },
+        { status: 408 },
+      );
+    if (error instanceof BodyTooLargeError)
+      return privateJson(
         { message: "The update is too large." },
         { status: 413 },
       );
-    body = JSON.parse(text);
-  } catch {
-    return NextResponse.json(
-      { message: "Enter a valid update." },
-      { status: 400 },
-    );
+    return privateJson({ message: "Enter a valid update." }, { status: 400 });
   }
 
   const parsed = updateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
+    return privateJson(
       { message: "Check the lead update and try again." },
       { status: 400 },
     );
@@ -84,7 +94,7 @@ export async function PATCH(
 
   const { id } = await context.params;
   if (!z.string().uuid().safeParse(id).success) {
-    return NextResponse.json(
+    return privateJson(
       { message: "That lead record was not found." },
       { status: 404 },
     );
@@ -96,7 +106,7 @@ export async function PATCH(
       Number.isNaN(date.valueOf()) ||
       date.toISOString().slice(0, 10) !== parsed.data.follow_up_date
     ) {
-      return NextResponse.json(
+      return privateJson(
         { message: "Choose a valid follow-up date." },
         { status: 400 },
       );
@@ -115,11 +125,11 @@ export async function PATCH(
   if (error || !data) {
     if (error)
       console.error("Admin lead update failed", error.code ?? "unknown");
-    return NextResponse.json(
+    return privateJson(
       { message: "The record could not be updated. Refresh and try again." },
       { status: error?.code === "PGRST116" ? 404 : 500 },
     );
   }
 
-  return NextResponse.json({ lead: data });
+  return privateJson({ lead: data });
 }

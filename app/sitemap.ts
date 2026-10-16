@@ -1,29 +1,15 @@
+import { getPublishedProjects } from "@/lib/cms/public";
 import type { MetadataRoute } from "next";
-import { services, projects } from "@/config/content";
 import { getSiteUrl } from "@/lib/site";
+import { getPublicPagePaths } from "@/lib/public-pages";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+/** Lists only public canonical destinations. No synthetic lastModified dates:
+ * a build timestamp is not evidence that a page's substantive content changed.
+ * Review indexing is controlled independently by robots, meta and HTTP headers. */
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
   if (!siteUrl) return [];
-
-  const paths = [
-    "/",
-    "/services",
-    ...services
-      .filter((s) => s.slug !== "website-development")
-      .map((service) => `/services/${service.slug}`),
-    "/portfolio",
-    ...projects.map((project) => `/portfolio/${project.slug}`),
-    "/about",
-    "/request-a-quote",
-    "/contact",
-    "/privacy-policy",
-    "/terms",
-    "/website-development",
-    "/business-websites",
-    "/ecommerce-websites",
-    "/industries",
-    "/pricing",
-  ];
-  return paths.map((path) => ({ url: `${siteUrl}${path}` }));
+  return getPublicPagePaths(await getPublishedProjects()).map((path) => ({
+    url: `${siteUrl}${path}`,
+  }));
 }

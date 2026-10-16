@@ -15,8 +15,9 @@ export function toInternationalPhoneNumber(number: string) {
 
 export function getWhatsAppUrl(
   message = "Hello GROWTHLY, I’d like a website quote for my business.",
+  number: string = business.contact.whatsapp,
 ) {
-  return `https://wa.me/${toInternationalPhoneNumber(business.contact.whatsapp).replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${toInternationalPhoneNumber(number).replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
 }
 
 export function getPhoneHref(number: string) {

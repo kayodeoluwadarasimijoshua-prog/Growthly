@@ -2,6 +2,21 @@ import fs from "node:fs/promises";
 import chromium, { setupLambdaEnvironment } from "@sparticuz/chromium";
 import { launch } from "chrome-launcher";
 import lighthouse from "lighthouse";
+const requestedPaths = process.env.PERFORMANCE_PATHS?.split(",")
+  .map((path) => path.trim())
+  .filter(Boolean);
+if (requestedPaths?.some((path) => !/^\/[a-z0-9/-]*$/.test(path)))
+  throw new Error(
+    "Performance paths must be local canonical paths without query data",
+  );
+const measurements = requestedPaths?.length
+  ? requestedPaths.map((path) => [path, "mobile"])
+  : [
+      ["/", "mobile"],
+      ["/", "desktop"],
+      ["/website-development", "mobile"],
+      ["/request-a-quote", "mobile"],
+    ];
 setupLambdaEnvironment("/tmp/al2023/lib");
 const chrome = await launch({
   chromePath: await chromium.executablePath(),
@@ -11,12 +26,7 @@ const chrome = await launch({
 });
 const summaries = [];
 try {
-  for (const [path, mode] of [
-    ["/", "mobile"],
-    ["/", "desktop"],
-    ["/website-development", "mobile"],
-    ["/request-a-quote", "mobile"],
-  ]) {
+  for (const [path, mode] of measurements) {
     const config =
       mode === "desktop"
         ? (await import("lighthouse/core/config/desktop-config.js")).default

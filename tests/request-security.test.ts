@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { isSameOriginRequest } from "@/lib/request-security";
 
 describe("same-origin request guard", () => {
@@ -41,4 +41,18 @@ describe("same-origin request guard", () => {
     });
     expect(isSameOriginRequest(request)).toBe(true);
   });
+});
+
+afterEach(() => vi.unstubAllEnvs());
+it("ignores a forged forwarded host unless the host trust setting is enabled", () => {
+  vi.stubEnv("TRUST_PROXY_HEADERS", "false");
+  vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://growthly.example");
+  const r = new Request("https://growthly.example/api/inquiries", {
+    headers: {
+      host: "growthly.example",
+      origin: "https://attacker.example",
+      "x-forwarded-host": "attacker.example",
+    },
+  });
+  expect(isSameOriginRequest(r)).toBe(false);
 });

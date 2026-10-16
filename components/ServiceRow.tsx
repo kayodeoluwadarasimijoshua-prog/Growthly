@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getServicePath } from "@/config/service-pages";
 import { ArrowUpRight } from "lucide-react";
 import type { ServiceDefinition } from "@/config/content";
 
@@ -18,7 +19,7 @@ export function ServiceRow({
       <p>{service.summary}</p>
       <Link
         className="service-row__link"
-        href={`/services/${service.slug}`}
+        href={getServicePath(service.slug)}
         aria-label={`Learn about ${service.title}`}
       >
         <ArrowUpRight size={18} aria-hidden="true" />

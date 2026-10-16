@@ -1,6 +1,11 @@
+import { PublicSiteSettings } from "@/components/PublicSiteSettings";
+import { getContentState } from "@/lib/cms/public";
+import { defaultCmsDocument } from "@/lib/cms/defaults";
 import type { Metadata, Viewport } from "next";
+import { isPublicIndexingEnabled } from "@/lib/indexing";
 import "./globals.css";
 import { SiteHeader } from "@/components/SiteHeader";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { SiteFooter } from "@/components/SiteFooter";
 import { AnalyticsConsent } from "@/components/AnalyticsConsent";
 import { business } from "@/config/business";
@@ -38,7 +43,10 @@ export const metadata: Metadata = {
     title: `${business.name} — ${business.tagline}`,
     description: business.description,
   },
-  robots: { index: process.env.SITE_INDEXING_ENABLED === "true", follow: true },
+  robots: {
+    index: isPublicIndexingEnabled(),
+    follow: true,
+  },
 };
 
 export const viewport: Viewport = {
@@ -48,22 +56,26 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-function OrganizationSchema() {
+function OrganizationSchema({ phone }: { phone?: string }) {
   if (!siteUrl) return null;
   const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${siteUrl}/#organization`,
     name: business.name,
     url: siteUrl,
+    logo: `${siteUrl}/brand/growthly-mark-dark.svg`,
     description: business.description,
     areaServed: { "@type": "Country", name: "Nigeria" },
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: toInternationalPhoneNumber(business.contact.whatsapp),
-      contactType: "sales enquiries",
-      areaServed: "NG",
-      availableLanguage: "English",
-    },
+    contactPoint: phone
+      ? {
+          "@type": "ContactPoint",
+          telephone: toInternationalPhoneNumber(phone),
+          contactType: "sales enquiries",
+          areaServed: "NG",
+          availableLanguage: "English",
+        }
+      : undefined,
   };
   return (
     <script
@@ -75,6 +87,8 @@ function OrganizationSchema() {
             schema,
             {
               "@type": "WebSite",
+              "@id": `${siteUrl}/#website`,
+              publisher: { "@id": `${siteUrl}/#organization` },
               name: business.name,
               url: siteUrl,
               description: business.description,
@@ -86,20 +100,41 @@ function OrganizationSchema() {
   );
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const state = await getContentState();
+  const settings = state.document?.settings ?? defaultCmsDocument().settings;
+  const publicSettings = {
+    whatsapp: settings.whatsapp,
+    alternativePhone: settings.alternativePhone,
+    tagline: settings.tagline,
+    prices: settings.prices,
+  };
   return (
     <html lang="en">
       <body>
-        <a className="skip-link" href="#main-content">
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main-content">{children}</main>
-        <SiteFooter />
-        <AnalyticsConsent />
-        <OrganizationSchema />
+        <PublicSiteSettings
+          settings={publicSettings}
+          available={state.available}
+          projectServices={Object.fromEntries(
+            (state.document?.projects ?? [])
+              .filter((p) => p.published && p.publicationConfirmed)
+              .map((p) => [`/portfolio/${p.slug}`, p.service]),
+          )}
+        >
+          <a className="skip-link" href="#main-content">
+            Skip to content
+          </a>
+          <SiteHeader />
+          <main id="main-content">{children}</main>
+          <SiteFooter />
+          <FloatingWhatsApp />
+          <AnalyticsConsent />
+          <OrganizationSchema
+            phone={state.available ? settings.whatsapp : undefined}
+          />
+        </PublicSiteSettings>
       </body>
     </html>
   );

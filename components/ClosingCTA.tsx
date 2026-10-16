@@ -1,8 +1,10 @@
-import { StartProjectLink, WhatsAppButton } from "@/components/ContactLinks";
+import { StartProjectLink } from "@/components/ContactLinks";
 export function ClosingCTA({
+  service,
   title = "Ready to give your business a stronger online presence?",
   description = "Tell us what your business needs. We’ll review your requirements and discuss a suitable website solution.",
 }: {
+  service?: string;
   title?: string;
   description?: string;
 }) {
@@ -14,8 +16,7 @@ export function ClosingCTA({
         <p>{description}</p>
       </div>
       <div className="stack-md">
-        <StartProjectLink className="button button--light" />
-        <WhatsAppButton label="Chat on WhatsApp" light />
+        <StartProjectLink service={service} className="button button--light" />
       </div>
     </div>
   );

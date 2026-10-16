@@ -14,7 +14,7 @@ export default function NotFound() {
         <Link className="button button--primary" href="/">
           <ArrowLeft size={16} aria-hidden="true" /> Back to home
         </Link>
-        <Link className="button button--outline" href="/services">
+        <Link className="text-link" href="/services">
           Explore services <ArrowRight size={16} aria-hidden="true" />
         </Link>
       </div>

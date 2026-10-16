@@ -1,3 +1,4 @@
+import { analyticsEnabled, readConsent } from "@/lib/analytics-consent";
 const UTM_KEYS = [
   "utm_source",
   "utm_medium",
@@ -18,7 +19,12 @@ function valuesFromParams(params: URLSearchParams): Attribution {
 }
 
 export function captureUtmAttribution() {
-  if (typeof window === "undefined") return;
+  if (
+    typeof window === "undefined" ||
+    !analyticsEnabled() ||
+    readConsent() !== "granted"
+  )
+    return;
   const incoming = valuesFromParams(
     new URLSearchParams(window.location.search),
   );
@@ -44,7 +50,12 @@ export function captureUtmAttribution() {
 }
 
 export function getUtmAttribution(): Attribution {
-  if (typeof window === "undefined") return {};
+  if (
+    typeof window === "undefined" ||
+    !analyticsEnabled() ||
+    readConsent() !== "granted"
+  )
+    return {};
   const fromCurrentUrl = valuesFromParams(
     new URLSearchParams(window.location.search),
   );

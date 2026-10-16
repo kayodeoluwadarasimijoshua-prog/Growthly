@@ -9,7 +9,12 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:browser": "node scripts/prepare-browser.mjs && playwright test"
+    "test:browser": "node scripts/prepare-browser.mjs && playwright test",
+    "prepare:starxco-image": "node scripts/prepare-starxco-image.mjs",
+    "test:cms:harness": "node scripts/cms-test-server.mjs",
+    "test:cms:browser": "node scripts/prepare-browser.mjs && playwright test cms-editor.spec.ts cms-runtime.spec.ts",
+    "launch:check": "node scripts/check-launch-config.mjs",
+    "audit:seo": "node scripts/prepare-browser.mjs && node scripts/audit-public-seo.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -22,6 +27,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@electric-sql/pglite": "^0.5.10",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.0",
     "@sparticuz/chromium": "^153.0.0",
@@ -31,8 +37,10 @@
     "eslint": "^10.12.0",
     "globals": "^17.13.0",
     "lighthouse": "^13.5.0",
+    "sharp": "^0.35.5",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.71.1",
+    "vite": "^8.3.4",
     "vitest": "^5.0.3"
   }
 }

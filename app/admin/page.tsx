@@ -26,6 +26,9 @@ export default async function AdminPage() {
             server-only service key using the deployment guide before managing
             private lead records.
           </p>
+          <Link className="button button--outline mt-24" href="/admin/content">
+            Website content — projects and updates
+          </Link>
           <Link className="text-link mt-24" href="/admin/login">
             Admin setup <ArrowRight size={16} aria-hidden="true" />
           </Link>
@@ -71,6 +74,9 @@ export default async function AdminPage() {
             Check that the database migration has been applied, row-level
             security is enabled and this account has the admin role.
           </p>
+          <Link className="text-link mt-24" href="/admin/content">
+            Manage website content instead
+          </Link>
           <Link className="text-link mt-24" href="/admin">
             Try again <ArrowRight size={16} aria-hidden="true" />
           </Link>

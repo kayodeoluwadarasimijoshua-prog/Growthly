@@ -1,3 +1,5 @@
+import { websitePriceSummary, websiteHostingOffer } from "@/config/business";
+
 export const websiteTypes = [
   "Business website",
   "E-commerce website",
@@ -68,11 +70,11 @@ export const industries = [
     "Product stories, clear categories and helpful purchase or enquiry paths.",
   ],
   [
-    "Real estate",
+    "Real estate website development",
     "Property photos, listing details, location information and viewing enquiries.",
   ],
   [
-    "Schools & education",
+    "Website design for schools",
     "Admissions guidance, programmes, term information and parent enquiries.",
   ],
   [
@@ -91,7 +93,7 @@ export const industries = [
 export const websiteFAQs = [
   [
     "How much does a business website cost?",
-    "Cost depends on pages, content, functionality and integrations. Our packages are starting points, not fixed prices. We confirm a written quote with inclusions and separate costs before you commit.",
+    `${websitePriceSummary}. These are starting design-and-development prices, not a fixed quote for every project. Pages, content and integrations affect the final cost. ${websiteHostingOffer.summary} ${websiteHostingOffer.renewals} Maintenance and third-party fees are separate unless agreed in writing.`,
   ],
   [
     "How long does a website take to build?",
@@ -115,7 +117,7 @@ export const websiteFAQs = [
   ],
   [
     "Do we need to buy a domain?",
-    "You need a domain for a professional custom website. If you already own one, we can assess its setup. Registration, renewal, hosting and email are separate unless explicitly included in your proposal.",
+    `${websiteHostingOffer.summary} If you already own a domain, we can assess its setup. ${websiteHostingOffer.renewals} Business email and other domain extensions are separately scoped.`,
   ],
   [
     "Who provides website content and images?",

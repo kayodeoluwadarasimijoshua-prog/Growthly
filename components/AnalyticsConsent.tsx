@@ -5,51 +5,36 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { safeReferrer, trackEvent } from "@/lib/analytics";
 import { captureUtmAttribution } from "@/lib/attribution";
+import { getServicePageForPath } from "@/config/service-pages";
 
-const CONSENT_KEY = "growthly_analytics_consent";
-const CONSENT_EVENT = "growthly-analytics-consent-change";
-
-type ConsentChoice = "granted" | "denied" | "unknown";
-
-function getConsentSnapshot(): ConsentChoice {
-  try {
-    const stored = window.localStorage.getItem(CONSENT_KEY);
-    return stored === "granted" || stored === "denied" ? stored : "unknown";
-  } catch {
-    return "unknown";
-  }
-}
-
-function subscribeToConsent(callback: () => void) {
-  window.addEventListener("storage", callback);
-  window.addEventListener(CONSENT_EVENT, callback);
-  return () => {
-    window.removeEventListener("storage", callback);
-    window.removeEventListener(CONSENT_EVENT, callback);
-  };
-}
+import {
+  analyticsEnabled,
+  readConsent,
+  writeConsent,
+  subscribeConsent,
+  type ConsentChoice,
+} from "@/lib/analytics-consent";
 
 export function AnalyticsConsent() {
   const pathname = usePathname();
   const choice = useSyncExternalStore(
-    subscribeToConsent,
-    getConsentSnapshot,
+    subscribeConsent,
+    readConsent,
     () => "unknown",
   );
   const gaId = process.env.NEXT_PUBLIC_GA4_ID;
-  const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
-  const analyticsConfigured = Boolean(gaId || adsId);
+  const analyticsConfigured = analyticsEnabled();
   const isAdmin = pathname?.startsWith("/admin") ?? false;
   const hasAnalytics = analyticsConfigured && !isAdmin;
 
   useEffect(() => {
-    captureUtmAttribution();
-  }, [pathname]);
+    if (!isAdmin && choice === "granted" && hasAnalytics)
+      captureUtmAttribution();
+  }, [pathname, choice, isAdmin, hasAnalytics]);
 
   useEffect(() => {
-    if (!hasAnalytics) return;
-    if (choice !== "granted") {
-      if (choice === "denied" && window.gtag) {
+    if (!hasAnalytics || choice !== "granted") {
+      if (window.gtag) {
         window.gtag("consent", "update", {
           analytics_storage: "denied",
           ad_storage: "denied",
@@ -62,9 +47,9 @@ export function AnalyticsConsent() {
     if (window.growthlyAnalyticsReady) {
       window.gtag?.("consent", "update", {
         analytics_storage: "granted",
-        ad_storage: "granted",
-        ad_user_data: "granted",
-        ad_personalization: "granted",
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
       });
       return;
     }
@@ -77,33 +62,26 @@ export function AnalyticsConsent() {
       });
     window.gtag("consent", "default", {
       analytics_storage: "granted",
-      ad_storage: "granted",
-      ad_user_data: "granted",
-      ad_personalization: "granted",
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
     });
     window.gtag("js", new Date());
     if (gaId) {
       window.gtag("config", gaId, {
         send_page_view: false,
         allow_google_signals: false,
+        allow_ad_personalization_signals: false,
         page_location: `${window.location.origin}${window.location.pathname}`,
         page_referrer: safeReferrer(),
       });
     }
-    if (adsId) {
-      window.gtag("config", adsId, {
-        send_page_view: false,
-        page_location: `${window.location.origin}${window.location.pathname}`,
-        page_referrer: safeReferrer(),
-      });
-    }
-
     const script = document.createElement("script");
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId || adsId || "")}`;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId || "")}`;
     document.head.appendChild(script);
     window.growthlyAnalyticsReady = true;
-  }, [adsId, choice, gaId, hasAnalytics]);
+  }, [choice, gaId, hasAnalytics]);
 
   useEffect(() => {
     if (!isAdmin && choice === "granted" && window.growthlyAnalyticsReady) {
@@ -111,24 +89,22 @@ export function AnalyticsConsent() {
       if (pathname.startsWith("/portfolio"))
         trackEvent("portfolio_visit", { page_path: pathname });
       if (pathname === "/pricing") trackEvent("pricing_visit");
-      if (
-        [
-          "/website-development",
-          "/business-websites",
-          "/ecommerce-websites",
-        ].includes(pathname)
-      )
-        trackEvent("service_visit", { page_path: pathname });
+      const servicePage = getServicePageForPath(pathname);
+      if (servicePage)
+        trackEvent("service_visit", {
+          page_path: pathname,
+          service: servicePage.slug,
+        });
+      else if (["/business-websites", "/ecommerce-websites"].includes(pathname))
+        trackEvent("service_visit", {
+          page_path: pathname,
+          service: "website-development",
+        });
     }
   }, [choice, isAdmin, pathname]);
 
   function choose(next: Exclude<ConsentChoice, "unknown">) {
-    try {
-      window.localStorage.setItem(CONSENT_KEY, next);
-    } catch {
-      // If local storage is unavailable, this choice applies only until navigation or reload.
-    }
-    window.dispatchEvent(new Event(CONSENT_EVENT));
+    writeConsent(next);
   }
 
   if (!hasAnalytics || choice !== "unknown") return null;
@@ -160,9 +136,7 @@ export function AnalyticsConsent() {
 
 export function AnalyticsPreferencesButton() {
   const pathname = usePathname();
-  const configured = Boolean(
-    process.env.NEXT_PUBLIC_GA4_ID || process.env.NEXT_PUBLIC_GOOGLE_ADS_ID,
-  );
+  const configured = analyticsEnabled();
   if (!configured || pathname?.startsWith("/admin")) return null;
   return (
     <button
@@ -175,12 +149,7 @@ export function AnalyticsPreferencesButton() {
           ad_user_data: "denied",
           ad_personalization: "denied",
         });
-        try {
-          window.localStorage.removeItem(CONSENT_KEY);
-        } catch {
-          // The banner remains available for this page if storage is blocked.
-        }
-        window.dispatchEvent(new Event(CONSENT_EVENT));
+        writeConsent("unknown");
       }}
     >
       Privacy preferences

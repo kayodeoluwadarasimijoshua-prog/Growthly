@@ -72,11 +72,11 @@ describe("project inquiry validation", () => {
     expect(result.success).toBe(false);
   });
 
-  it("keeps website prices quotation-based until approved", () => {
+  it("publishes the owner-approved starting prices with clear scope", () => {
     expect(websitePackages.map((item) => item.price)).toEqual([
-      "Request a quote",
-      "Request a quote",
-      "Request a quote",
+      "From ₦100,000",
+      "From ₦200,000",
+      "From ₦300,000",
     ]);
     expect(
       websitePackages.every(

@@ -1,11 +1,16 @@
+import { getContentState } from "@/lib/cms/public";
+import { defaultCmsDocument } from "@/lib/cms/defaults";
 import Link from "next/link";
+import { servicePages } from "@/config/service-pages";
 import { Brand } from "@/components/Brand";
 import { business } from "@/config/business";
 import { getPhoneHref, getWhatsAppUrl } from "@/lib/site";
 import { TrackedAnchor } from "@/components/TrackedLink";
 import { AnalyticsPreferencesButton } from "@/components/AnalyticsConsent";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const state = await getContentState();
+  const settings = state.document?.settings ?? defaultCmsDocument().settings;
   return (
     <footer className="site-footer">
       <div className="container">
@@ -13,7 +18,7 @@ export function SiteFooter() {
           <div className="footer-brand">
             <Brand footer />
             <p>
-              {business.tagline} Professional websites and practical digital
+              {settings.tagline} Professional websites and practical digital
               support for Nigerian businesses.
             </p>
           </div>
@@ -31,13 +36,18 @@ export function SiteFooter() {
                   <Link href="/about">About GROWTHLY</Link>
                 </li>
                 <li>
-                  <Link href="/request-a-quote">Start a project</Link>
+                  <Link href={business.primaryCTA.href}>
+                    {business.primaryCTA.label}
+                  </Link>
                 </li>
               </ul>
             </div>
             <div className="footer-column">
-              <h2>Services</h2>
+              <h2>Websites & services</h2>
               <ul>
+                <li>
+                  <Link href="/services">All services</Link>
+                </li>
                 <li>
                   <Link href="/business-websites">Business websites</Link>
                 </li>
@@ -50,31 +60,43 @@ export function SiteFooter() {
                 <li>
                   <Link href="/industries">Industries</Link>
                 </li>
+                {servicePages
+                  .filter((page) => page.slug !== "website-development")
+                  .map((page) => (
+                    <li key={page.slug}>
+                      <Link href={page.path}>{page.label}</Link>
+                    </li>
+                  ))}
               </ul>
             </div>
             <div className="footer-column">
               <h2>Get in touch</h2>
               <ul>
                 <li>
-                  <TrackedAnchor
-                    eventName="whatsapp_click"
-                    href={getWhatsAppUrl(
-                      "Hello GROWTHLY, I have a question about your services.",
-                    )}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    WhatsApp {business.contact.whatsapp}
-                  </TrackedAnchor>
+                  {state.available && (
+                    <TrackedAnchor
+                      eventName="whatsapp_click"
+                      href={getWhatsAppUrl(
+                        "Hello GROWTHLY, I have a question about your services.",
+                        settings.whatsapp,
+                      )}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      WhatsApp {settings.whatsapp}
+                    </TrackedAnchor>
+                  )}
                 </li>
                 <li>
-                  <TrackedAnchor
-                    eventName="phone_click"
-                    eventParams={{ contact_type: "alternative_phone" }}
-                    href={getPhoneHref(business.contact.alternativePhone)}
-                  >
-                    Call {business.contact.alternativePhone}
-                  </TrackedAnchor>
+                  {state.available && (
+                    <TrackedAnchor
+                      eventName="phone_click"
+                      eventParams={{ contact_type: "alternative_phone" }}
+                      href={getPhoneHref(settings.alternativePhone)}
+                    >
+                      Call {settings.alternativePhone}
+                    </TrackedAnchor>
+                  )}
                 </li>
                 <li>
                   <Link href="/contact">Contact options</Link>
@@ -85,7 +107,7 @@ export function SiteFooter() {
         </div>
         <div className="footer-bottom">
           <span>
-            © {new Date().getFullYear()} GROWTHLY. {business.tagline}
+            © {new Date().getFullYear()} GROWTHLY. {settings.tagline}
           </span>
           <div className="footer-bottom__links">
             <Link href="/privacy-policy">Privacy notice</Link>

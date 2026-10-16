@@ -1,4 +1,10 @@
-# GROWTHLY handover
+# GROWTHLY handover — historical initial implementation
+
+> **Latest authority — owner content editor (15 October 2026):** projects/images, contacts, key introductions, FAQs and three website starting prices are now editable at `/admin/content`, with private drafts, explicit publication/pricing approval, conflict protection and draft-only history restoration. Read the [setup/owner guide](CONTENT-MANAGEMENT.md) and [implementation evidence](CMS-IMPLEMENTATION-2026-10-15.md) **before older sections below**. Implementation is local; no real Auth account/migration/Storage/host activation or deployment was performed. `SITE_CMS_ENABLED=false` and **`ONLINE_INQUIRIES_ENABLED=false`** remain the safe defaults; CMS credentials do not activate lead collection. The admin role is broad owner-only access, never a VA assignment. Pending StarXCO media is not auto-approved. This session cannot perform remote GitHub operations; use a new coding session for approved one-time setup/deployment, then routine edits use the editor. Earlier project-in-code instructions, validation counts, process IDs and “no new admin features” statements are historical and superseded for this feature. Preserve the WhatsApp control without pause/play buttons.
+
+**Fresh CMS delivery evidence:** 260 unit/integration tests across32 files; 19 explicitly mocked CMS browser cases and 95 whole-site browser regressions passed; types/lint/CMS-on and CMS-off builds passed; default19-page SEO audit zero findings, dependency audit zero known vulnerabilities. Final isolated default-mode performance: Home96 mobile/98 desktop, website94, quote98; accessibility/best practices100. Not live Supabase/field/deployment proof. Normal preview port3000, CMS disabled; test servers stopped. See the implementation report for exact scope, limits and remaining live gates.
+
+> **Superseded for next-session instructions:** read [NEXT-SESSION-HANDOVER.md](NEXT-SESSION-HANDOVER.md). This report records an earlier implementation stage; its quote-only prices, logo description, QA counts, and remote status are not current.
 
 13 October 2026 · session branch `arena/c8310713-growthly`
 
