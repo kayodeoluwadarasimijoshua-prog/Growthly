@@ -1,4 +1,16 @@
+> **CMS/lead opt-in update — 15 October 2026:** use [CONTENT-MANAGEMENT.md](CONTENT-MANAGEMENT.md) for the owner editor and its two unapplied migrations. Initial publication must exist before an owner-approved build/runtime `SITE_CMS_ENABLED=true` deployment. Routine supported publications then need no rebuild. **Keep `ONLINE_INQUIRIES_ENABLED=false` for WhatsApp-only operation, even with Supabase CMS credentials.** Nothing was remotely applied, enabled or deployed. Existing broad admin is owner-only, not a VA role. Older fixed prices below are approved defaults; a later owner publication is the current public price source.
+
 # Deployment and maintenance
+
+> Latest authority: [next-session handover](NEXT-SESSION-HANDOVER.md). The preview deployment below is historical and does not include the newest local work. This coding session is closed; publication requires a new session. Check current PR/project status before any remote action.
+
+## New resilience/privacy activation gates
+
+Read [LOCAL-AUDIT-IMPROVEMENTS.md](LOCAL-AUDIT-IMPROVEMENTS.md) before the historical deployment instructions below. New shared-limit and database-retry migrations are **prepared, not applied**. Keep their flags false pending approved online workflow, real schema/policy verification, proxy-header trust tests, cost/capacity and live acceptance. Without approved forwarded-IP trust, the local limiter uses a shared unknown-connection bucket; do not enable online collection without reviewing this and host/shared controls.
+
+Analytics now also requires `NEXT_PUBLIC_ANALYTICS_ENABLED=true` after account/privacy/network approval and visitor opt-in. **Google Ads tags/conversions are disabled**; old Ads IDs are not activation switches. Manual event dimensions/public routes are whitelisted; external referrers are origin-only. Real automatic-measurement/withdrawal behaviour still needs account review.
+
+For a future pending-image review, use `PROJECT_IMAGE_REVIEW_MODE=true` at build/start **and** browser test time only after valid image bytes and explicit screenshot-specific rights exist. In this checkout the four `.webp` patch entries were placeholders and excluded; no image is present. Keep the flag `false` and screenshot publication disabled. Normal release must rebuild with review mode off. Do not promote a guarded screenshot before client permission.
 
 ## Hosting decision
 
@@ -17,11 +29,11 @@ This deployment is protected by Vercel login. Public homepage/quote/robots fetch
 ## Preview and promotion
 
 1. Import or retain `kayodeoluwadarasimijoshua-prog/Growthly` in the **existing** Vercel project. Use the Next.js preset, `npm ci`, `npm run build`, supported Node 22 and the normal `.next` output. No static export.
-2. Review the session branch `arena/c8310713-growthly` in a Preview deployment. Do not change the production branch or move DNS just to inspect it.
+2. Review the branch assigned by the new coding session in a Preview deployment after preserving this session’s local changes. Do not change the production branch or move DNS just to inspect it.
 3. Preview settings: `NEXT_PUBLIC_SITE_URL=https://growthly.com.ng`, `SITE_INDEXING_ENABLED=false`. The quote form works through the explicit WhatsApp handoff even without secret credentials.
-4. For online form delivery, configure either Supabase project URL/service-role key or all three Resend values from `.env.example`. Admin authentication additionally needs the Supabase anon/public key. Follow [integration instructions](INTEGRATIONS.md). Keep all secrets in the provider dashboard; never in Git or browser variables.
+4. Only after explicit owner delivery/privacy approval, set `ONLINE_INQUIRIES_ENABLED=true` and configure either Supabase project URL/service-role key or all three Resend values from `.env.example`. Admin authentication additionally needs the Supabase anon/public key. Follow [integration instructions](INTEGRATIONS.md). Keep all secrets in the provider dashboard; never in Git or browser variables.
 5. Submit an authorised test lead; verify private record/inbox receipt, notification fallback, admin permissions and delete test data. Provider-mock tests are not substitutes for this.
-6. Confirm primary WhatsApp receipt manually from a phone, public contact details, package scope, privacy retention policy and terms. Prices remain quotation-based until owner-approved.
+6. Confirm primary WhatsApp receipt manually from a phone, public contact details, package scope, privacy retention policy and terms. Owner-approved starting website prices are ₦100,000 / ₦200,000 / ₦300,000; Starter is multi-page and all three packages include a free .com.ng domain and hosting for year one. Final scope, domain availability, hosting limits/ownership, renewal prices after year one and other separate fees must be confirmed in writing.
 7. Run `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, then `npm start` and `npm run test:browser`. Run Lighthouse with `node scripts/measure-performance.mjs`.
 8. Set **Production only** `SITE_INDEXING_ENABLED=true` and correct canonical origin, then make a fresh production build. Confirm Vercel Preview still has `false`. Production indexing values are read at build time for static pages.
 9. The authorised owner promotes the approved deployment or merges using the repository’s existing production workflow. This session does not alter another branch or production DNS.
@@ -36,16 +48,16 @@ The existing HTTPS site was retrievable; the revised site must be separately ver
 
 - Enquiry API checks origin, field types, lengths, consent, honeypot and request size. No private data is logged intentionally or returned in public listings.
 - In-process rate limit resets with instances and does not coordinate between them. Add host WAF limits or an approved shared rate-limit store for a production campaign. Do not trust raw forwarding headers on arbitrary self-hosted proxies.
-- Private storage uses server-only Supabase credentials. Existing admin uses user authentication and database RLS. No new admin features added.
+- Private storage uses server-only Supabase credentials. Existing admin uses user authentication and database RLS. The owner content editor also uses private content/history tables and a private project-media bucket; see the CMS guide.
 - Use MFA/provider access controls, restrict team members, back up database data and set a retention/deletion policy. Live RLS permissions and retention are owner acceptance tasks.
 - Supabase failure can fall back to an accepted Resend message. Email-only delivery creates no database record; keep an inbox/CRM workflow. Email provider acceptance does not guarantee inbox arrival.
 - Dependency audit passed locally; rerun regularly. No guarantee against future advisories.
 
 ## Analytics and commercial measurement
 
-The existing consent-gated GA4 setup was retained. Configure `NEXT_PUBLIC_GA4_ID` only after owner approval, disable GA4 enhanced measurement for automatic form interactions/outbound clicks and avoid URL/form-data capture, then inspect network payloads with a test account. Optional Ads conversion settings are in `.env.example`. No tags load by default; declined consent leaves forms and navigation working. Cloudflare Web Analytics was assessed but not added; it can be a future traffic/field-performance option rather than a second simultaneous tracker.
+The existing consent-gated GA4 setup was retained. Configure `NEXT_PUBLIC_GA4_ID` only after owner approval, disable GA4 enhanced measurement for automatic form interactions/outbound clicks and avoid URL/form-data capture, then inspect network payloads with a test account. Historical Ads placeholders remain in `.env.example`, but do not activate any Ads integration. No tags load by default; declined consent leaves forms and navigation working. Cloudflare Web Analytics was assessed but not added; it can be a future traffic/field-performance option rather than a second simultaneous tracker.
 
-Events: `quote_cta_click`, `whatsapp_click`, `portfolio_visit`, `pricing_visit`, `service_visit`, `generate_lead` for **confirmed online** delivery. A WhatsApp click is not a delivered lead or sale. `page_view` uses pathname-only location/referrer, not quote contents or query strings.
+Events: `quote_cta_click`, `whatsapp_click`, `portfolio_visit`, `pricing_visit`, `service_visit`, `generate_lead` for **confirmed online** delivery. A WhatsApp click is not a delivered lead or sale. `page_view` uses known public pathnames and origin-only external referrers, not quote contents or query strings.
 
 Maintain a private lead register (or use the existing admin when configured): source/campaign, delivered enquiry date, qualified/unqualified, quote value, proposal sent, won/lost, deposit and final revenue. Calculate qualified-enquiry rate, quote-to-sale conversion and attributed revenue from actual records, not click totals. For WhatsApp campaigns use non-personal source codes and confirm the source in the follow-up conversation. Search Console measures impressions, queries and clicks independently of enquiries.
 

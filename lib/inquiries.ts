@@ -41,7 +41,7 @@ export const inquirySchema = z
     full_name: z.string().trim().min(2).max(120),
     business_name: z.string().trim().min(2).max(140),
     consent: z.literal(true),
-    website_type: z.enum(websiteTypes),
+    website_type: z.union([z.enum(websiteTypes), z.literal("")]),
     existing_url: z
       .union([
         z.literal(""),
@@ -107,6 +107,20 @@ export const inquirySchema = z
   })
   .strict()
   .superRefine((value, context) => {
+    if (value.service === "website-development" && !value.website_type) {
+      context.addIssue({
+        code: "custom",
+        path: ["website_type"],
+        message: "Choose a website type.",
+      });
+    }
+    if (value.service !== "website-development" && value.website_type !== "") {
+      context.addIssue({
+        code: "custom",
+        path: ["website_type"],
+        message: "Website type only applies to website-development projects.",
+      });
+    }
     if (!value.phone) {
       context.addIssue({
         code: "custom",

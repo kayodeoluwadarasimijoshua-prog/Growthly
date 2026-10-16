@@ -1,5 +1,7 @@
+import { websiteHostingOffer } from "@/config/business";
 import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
+import { BreadcrumbTrail } from "@/components/PageIntro";
 export const metadata = pageMetadata(
   "Terms of service",
   "Website-use terms and how Growthly agrees scope, content responsibilities, payments, revisions and project handover.",
@@ -8,7 +10,7 @@ export const metadata = pageMetadata(
 const sections = [
   [
     "Using this website",
-    "This website introduces Growthly’s services and lets you enquire about a project. Do not submit unlawful content, interfere with the site or send credentials or sensitive personal information. Concept projects are fictional demonstrations, not client results or live stores.",
+    "This website introduces Growthly’s services and lets you enquire about a project. Do not submit unlawful content, interfere with the site or send credentials or sensitive personal information.",
   ],
   [
     "Enquiries and proposals",
@@ -28,7 +30,7 @@ const sections = [
   ],
   [
     "Timing and third-party services",
-    "Delivery depends on scope, content readiness, feedback and external service approvals. Domain and hosting renewals, paid integrations, payment-provider fees and ongoing maintenance are separate unless included in writing. Third-party availability and terms are outside Growthly’s control.",
+    `Delivery depends on scope, content readiness, feedback and external service approvals. ${websiteHostingOffer.summary} ${websiteHostingOffer.renewals} Paid integrations, payment-provider fees and ongoing maintenance are separate unless included in writing. Third-party availability and terms are outside Growthly’s control.`,
   ],
   [
     "Results and support",
@@ -44,6 +46,7 @@ export default function Page() {
     <>
       <section className="page-hero">
         <div className="container">
+          <BreadcrumbTrail items={[{ name: "Terms of service", path: "/terms" }]} />
           <span className="eyebrow">Last updated · 13 October 2026</span>
           <h1>Clear terms for a clear working relationship.</h1>
           <p>

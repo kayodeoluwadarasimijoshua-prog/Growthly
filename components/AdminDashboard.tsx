@@ -175,6 +175,12 @@ export function AdminDashboard({
         <div className="container admin-header__inner">
           <Brand />
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <a
+              className="button button--outline button--small"
+              href="/admin/content"
+            >
+              Website content
+            </a>
             <span className="muted" style={{ fontSize: 12 }}>
               {userEmail}
             </span>

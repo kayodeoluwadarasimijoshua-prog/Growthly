@@ -1,54 +1,25 @@
-import { PanelsTopLeft, PenTool } from "lucide-react";
-
-export function HeroArtwork() {
+import { getFeaturedProject } from "@/lib/cms/public";
+import Link from "next/link";
+import { ProjectCard } from "@/components/ProjectCard";
+/** One authentic project as proof, replacing the fictional hero mockup. */
+export async function HeroArtwork() {
+  const project = await getFeaturedProject();
+  if (!project)
+    return (
+      <div className="hero-project service-focus-panel">
+        <h2>Build around your customers’ next step.</h2>
+        <p>
+          Explore website features, agreed scope and the process before
+          preparing your brief.
+        </p>
+        <Link className="text-link" href="/website-development">
+          Explore website development
+        </Link>
+      </div>
+    );
   return (
-    <figure
-      className="hero-art"
-      aria-label="A custom GROWTHLY creative project mockup"
-    >
-      <div className="hero-art__canvas" aria-hidden="true" />
-      <div className="hero-browser" aria-hidden="true">
-        <div className="hero-browser__bar">
-          <i />
-          <i />
-          <i />
-          <span className="hero-browser__address" />
-        </div>
-        <div className="hero-browser__screen">
-          <div className="hero-browser__message">
-            <small>CARE, ROOTED IN NATURE</small>
-            <strong>
-              A softer
-              <br />
-              kind of care.
-            </strong>
-            <span>Thoughtful essentials for your everyday ritual.</span>
-            <b>EXPLORE THE SET</b>
-          </div>
-          <div className="hero-browser__product">
-            <div className="product-bottle" />
-          </div>
-        </div>
-      </div>
-      <div
-        className="hero-service-tag hero-service-tag--top"
-        aria-hidden="true"
-      >
-        <PenTool size={16} /> Business-focused design
-      </div>
-      <div
-        className="hero-service-tag hero-service-tag--bottom"
-        aria-hidden="true"
-      >
-        <PanelsTopLeft size={16} /> Website development
-      </div>
-      <div className="hero-art-caption">
-        Original website concept · Kora Botanics
-      </div>
-      <figcaption className="sr-only">
-        Original mockup for Kora Botanics, a fictional retail concept. The
-        product preview is illustrative and does not represent a client project.
-      </figcaption>
-    </figure>
+    <div className="hero-project">
+      <ProjectCard project={project} priority />
+    </div>
   );
 }

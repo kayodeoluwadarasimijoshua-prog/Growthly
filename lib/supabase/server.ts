@@ -1,4 +1,5 @@
 import "server-only";
+import { providerFetch } from "@/lib/provider-fetch";
 
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
@@ -7,14 +8,14 @@ import { cookies } from "next/headers";
 export function hasSupabaseAuthConfig() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
 }
 
 export function hasSupabaseLeadStoreConfig() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
   );
 }
 
@@ -30,6 +31,9 @@ export async function createSupabaseServerClient() {
 
   const cookieStore = await cookies();
   return createServerClient(url, anonKey, {
+    // Keep our bounded transport deadline meaningful; no hidden SDK backoff/retries.
+    db: { retry: false },
+    global: { fetch: providerFetch },
     cookieOptions: {
       path: "/",
       sameSite: "lax",
@@ -61,6 +65,9 @@ export function createSupabaseLeadWriter() {
     throw new Error("Supabase lead storage is not configured.");
 
   return createClient(url, serviceRoleKey, {
+    // Keep our bounded transport deadline meaningful; no hidden SDK backoff/retries.
+    db: { retry: false },
+    global: { fetch: providerFetch },
     auth: {
       autoRefreshToken: false,
       persistSession: false,

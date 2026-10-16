@@ -1,9 +1,10 @@
+import { seoPages } from "@/config/seo";
 import { WebsiteSalesPage } from "@/components/WebsiteSalesPage";
 import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata(
-  "Business websites for small and growing companies",
-  "Business website design for Nigerian small businesses: clear services, useful contact options and a professional online presence.",
-  "/business-websites",
+  seoPages.business.title,
+  seoPages.business.description,
+  seoPages.business.path,
 );
 export default function Page() {
   return <WebsiteSalesPage kind="business" />;

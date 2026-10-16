@@ -10,7 +10,9 @@ export function isSameOriginRequest(request: Request) {
       .get("x-forwarded-host")
       ?.split(",")[0]
       ?.trim();
-    const requestHost = forwardedHost || request.headers.get("host");
+    const requestHost =
+      (process.env.TRUST_PROXY_HEADERS === "true" && forwardedHost) ||
+      request.headers.get("host");
     if (
       requestHost &&
       originUrl.host.toLowerCase() === requestHost.toLowerCase()

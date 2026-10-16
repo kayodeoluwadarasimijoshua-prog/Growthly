@@ -1,3 +1,9 @@
+import {
+  publicServiceSlugs,
+  publicRoutePaths,
+} from "@/config/public-route-ids";
+import { websitePackages } from "@/config/business";
+import { analyticsEnabled, readConsent } from "@/lib/analytics-consent";
 export type GrowthlyAnalyticsEvent =
   | "service_cta_click"
   | "quote_cta_click"
@@ -19,6 +25,34 @@ declare global {
   }
 }
 
+const publicPaths = new Set(publicRoutePaths);
+function isPublicPath(path: string) {
+  if (publicPaths.has(path)) return true;
+  // New CMS case studies are allowed only when the server actually rendered a
+  // published project for this exact pathname. No query/referrer-derived registry.
+  return (
+    typeof document !== "undefined" &&
+    /^\/portfolio\/[a-z0-9-]{1,80}$/.test(path) &&
+    document
+      .querySelector?.("[data-published-project]")
+      ?.getAttribute("data-published-project") === path
+  );
+}
+function safeParameters(params: EventParameters = {}) {
+  const safe: EventParameters = {};
+  if (publicServiceSlugs.some((s) => s === params.service))
+    safe.service = params.service;
+  if (websitePackages.some((p) => p.id === params.package))
+    safe.package = params.package;
+  if (params.placement === "floating_contact")
+    safe.placement = params.placement;
+  if (params.contact_type === "alternative_phone")
+    safe.contact_type = params.contact_type;
+  if (typeof params.page_path === "string" && isPublicPath(params.page_path))
+    safe.page_path = params.page_path;
+  return safe;
+}
+
 export function trackEvent(
   name: GrowthlyAnalyticsEvent | "page_view",
   params?: EventParameters,
@@ -26,17 +60,15 @@ export function trackEvent(
   if (
     typeof window === "undefined" ||
     !window.gtag ||
+    name === "conversion" ||
+    !isPublicPath(window.location.pathname) ||
+    !analyticsEnabled() ||
+    readConsent() !== "granted" ||
     window.location.pathname.startsWith("/admin")
   )
     return;
-  try {
-    if (window.localStorage.getItem("growthly_analytics_consent") !== "granted")
-      return;
-  } catch {
-    return;
-  }
   window.gtag("event", name, {
-    ...params,
+    ...safeParameters(params),
     page_location: `${window.location.origin}${window.location.pathname}`,
     page_referrer: safeReferrer(),
   });
@@ -44,19 +76,13 @@ export function trackEvent(
 
 export function trackLeadConversion() {
   trackEvent("generate_lead");
-
-  const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
-  const conversionLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
-  if (adsId && conversionLabel) {
-    trackEvent("conversion", { send_to: `${adsId}/${conversionLabel}` });
-  }
 }
 
 export function safeReferrer() {
   if (typeof document === "undefined" || !document.referrer) return "";
   try {
     const url = new URL(document.referrer);
-    return `${url.origin}${url.pathname}`;
+    return url.origin;
   } catch {
     return "";
   }

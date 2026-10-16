@@ -1,124 +1,173 @@
+import { BreadcrumbTrail } from "@/components/PageIntro";
+import { SectionHeading } from "@/components/SectionHeading";
 import type { Metadata } from "next";
-import Image from "next/image";
+import { ProjectPreview } from "@/components/ProjectPreview";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { getServicePage, sentenceServiceName } from "@/config/service-pages";
 import { projects } from "@/config/content";
+import { getPublishedProjects } from "@/lib/cms/public";
 import { ClosingCTA } from "@/components/ClosingCTA";
 import { pageMetadata } from "@/lib/seo";
-
 export function generateStaticParams() {
   return projects.map(({ slug }) => ({ slug }));
 }
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const project = projects.find((item) => item.slug === slug);
-  if (!project) return {};
-  return pageMetadata(
-    `${project.name} concept`,
-    project.summary,
-    `/portfolio/${project.slug}`,
-  );
+  const project = (await getPublishedProjects()).find((p) => p.slug === slug);
+  return project
+    ? pageMetadata(
+        `${project.name} ${!project.service || project.service === "website-development" ? "Website" : "Creative"} Project`,
+        project.summary,
+        `/portfolio/${slug}`,
+      )
+    : {};
 }
-
 export default async function CaseStudyPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const project = projects.find((item) => item.slug === slug);
+  const project = (await getPublishedProjects()).find((p) => p.slug === slug);
   if (!project) notFound();
-
+  const service = getServicePage(project.service ?? "website-development")!;
+  const isWebsite = service.slug === "website-development";
   return (
-    <>
-      <section className="case-hero">
+    <div
+      className="professional-sales-page"
+      data-published-project={`/portfolio/${project.slug}`}
+    >
+      <section className="page-hero">
         <div className="container">
+          <BreadcrumbTrail
+            items={[
+              { name: "Our work", path: "/portfolio" },
+              { name: project.name, path: `/portfolio/${slug}` },
+            ]}
+          />
           <Link className="text-link" href="/portfolio">
-            <ArrowLeft size={16} aria-hidden="true" /> Back to concepts
+            <ArrowLeft size={16} aria-hidden="true" /> Back to our work
           </Link>
-          <div className="page-hero__grid" style={{ marginTop: 35 }}>
-            <div>
-              <span className="eyebrow">
-                Self-initiated concept · {project.category}
+          <span className="eyebrow mt-24">
+            {project.kind === "demonstration"
+              ? "Self-initiated demonstration"
+              : "Client project"}{" "}
+            · {project.category}
+          </span>
+          <h1>{project.name}</h1>
+          <p>{project.summary}</p>
+          {project.liveUrl && (
+            <a
+              className="text-link mt-24"
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Visit live website <ArrowUpRight size={16} aria-hidden="true" />
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          )}
+          {project.videoUrl && (
+            <a
+              className="text-link mt-24"
+              href={project.videoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Watch video sample{" "}
+              <span className="sr-only">
+                on an external site (opens in a new tab)
               </span>
-              <h1 style={{ marginTop: 18 }}>{project.name}</h1>
-              <p>{project.summary}</p>
-              <div className="case-hero__meta">
-                <span>
-                  <strong>Concept scope:</strong> {project.services.join(" · ")}
-                </span>
-              </div>
-            </div>
-            <div className="page-hero__aside">
-              <strong>What this page represents</strong>A fictional,
-              self-initiated sample created to explore a possible creative
-              direction. It is not a commissioned client project.
-            </div>
-          </div>
-          <figure className="case-hero__image" style={{ marginTop: 42 }}>
-            <Image
-              src={project.image}
-              alt={project.imageAlt}
-              width={1200}
-              height={840}
-              priority
-              sizes="(max-width: 760px) 100vw, 1200px"
-            />
-          </figure>
+            </a>
+          )}
         </div>
       </section>
-
       <section className="section">
-        <div className="container case-content">
+        <div
+          className={`container project-case-grid${project.image ? "" : " project-case-grid--text-only"}`}
+        >
+          {project.image && (
+            <figure>
+              <ProjectPreview project={project} priority />
+              <figcaption className="project-image-credit">
+                {project.image.kind === "screenshot"
+                  ? "Website screenshot."
+                  : project.image.kind === "artwork"
+                    ? "Project artwork."
+                    : "Homepage photo, not a website screenshot."}{" "}
+                {project.image.credit}
+                {!project.image.permissionConfirmed && (
+                  <span className="project-image-approval">
+                    {" "}
+                    Preview only — client publication permission pending.
+                  </span>
+                )}
+              </figcaption>
+            </figure>
+          )}
           <div>
-            <span className="eyebrow">Concept overview</span>
-            <p className="case-content__lead" style={{ marginTop: 18 }}>
-              {project.concept}
-            </p>
-            <div className="case-disclaimer">{project.note}</div>
-          </div>
-          <div className="case-content__body">
-            <h2>Design intent</h2>
-            <p>{project.creativeIntent}</p>
-            <h2>Design choices</h2>
-            <ul className="check-list">
-              {project.designChoices.map((choice) => (
-                <li key={choice}>
-                  <Check size={16} aria-hidden="true" />
-                  <span>{choice}</span>
-                </li>
-              ))}
-            </ul>
-            <h2>Illustrative scope</h2>
-            <ul className="check-list">
+            <h2>What we delivered</h2>
+            <p>{project.overview}</p>
+            <ul className="case-feature-list">
               {project.scope.map((item) => (
-                <li key={item}>
-                  <Check size={16} aria-hidden="true" />
-                  <span>{item}</span>
-                </li>
+                <li key={item}>{item}</li>
               ))}
             </ul>
-            <p style={{ marginTop: 25, fontSize: 13 }}>
-              The ideas shown here are illustrative only. Any real project would
-              begin with a client brief and an approved proposal.
-            </p>
+            <p className="form-fineprint">{project.note}</p>
           </div>
         </div>
       </section>
-      <section className="section section--soft section--compact">
+      <section className="section section--soft">
+        <div className="container">
+          <div className="case-purpose">
+            <h2>
+              {isWebsite
+                ? "The purpose behind the pages"
+                : "The purpose behind the work"}
+            </h2>
+            <p>{project.creativeIntent}</p>
+          </div>
+        </div>
+      </section>
+      <section className="section">
+        <div className="container">
+          <SectionHeading
+            eyebrow="Design & content decisions"
+            title="Making the important information easier to find."
+            description="These decisions describe the work and its brief, not measured commercial outcomes."
+          />
+          <div className="case-design-grid">
+            {project.designChoices.map((choice, index) => (
+              <article key={choice}>
+                <span className="editorial-number" aria-hidden="true">
+                  0{index + 1}
+                </span>
+                <h3>{choice}</h3>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="section section--compact">
         <div className="container">
           <ClosingCTA
-            title="Let’s shape a direction around your business."
-            description="Start with the work your business needs and the people you want to reach."
+            service={isWebsite ? undefined : service.slug}
+            {...(!isWebsite
+              ? {
+                  title: `Let’s discuss your ${sentenceServiceName(service.label)} project.`,
+                  description:
+                    "Share your requirements so we can agree the right service-specific scope and quote.",
+                }
+              : {})}
           />
         </div>
       </section>
-    </>
+    </div>
   );
 }

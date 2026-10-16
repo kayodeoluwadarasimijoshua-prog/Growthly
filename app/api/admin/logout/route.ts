@@ -1,4 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+import { privateJson } from "@/lib/api-response";
 import { isSameOriginRequest } from "@/lib/request-security";
 import {
   createSupabaseServerClient,
@@ -9,7 +10,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
-    return NextResponse.json(
+    return privateJson(
       { message: "This request could not be accepted." },
       { status: 403 },
     );
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
       const supabase = await createSupabaseServerClient();
       await supabase.auth.signOut();
     } catch {
-      return NextResponse.json(
+      return privateJson(
         {
           message:
             "Sign-out could not be completed. Please close the browser session and try again.",
@@ -28,5 +29,5 @@ export async function POST(request: NextRequest) {
       );
     }
   }
-  return NextResponse.json({ ok: true });
+  return privateJson({ ok: true });
 }

@@ -6,8 +6,9 @@ import {
   Search,
   MessageCircle,
 } from "lucide-react";
-import { websiteSolutions, websiteFAQs, industries } from "@/config/websites";
-import { projects } from "@/config/content";
+import { websiteSolutions, industries } from "@/config/websites";
+import { getPublishedProjects, getSiteSettings } from "@/lib/cms/public";
+import { expandPriceTokens } from "@/lib/cms/format";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ProjectCard } from "@/components/ProjectCard";
 export function Solutions() {
@@ -26,33 +27,55 @@ export function Solutions() {
     </div>
   );
 }
-export function WorkPreview() {
+export async function WorkPreview() {
+  const projects = (await getPublishedProjects()).filter(
+    (p) =>
+      (p.service ?? "website-development") === "website-development" &&
+      p.kind === "client",
+  );
+  if (!projects.length) return null;
   return (
     <section className="section section--soft">
       <div className="container">
         <SectionHeading
-          eyebrow="A look at what’s possible"
-          title="Small businesses. Thoughtful websites."
-          description="Original, self-initiated website concepts. Demonstration work—not commissioned client projects or evidence of business results."
+          eyebrow="Selected website work"
+          title="Real projects. Clear purpose."
+          description="Explore approved website projects and the decisions behind them."
           action={
             <Link className="text-link" href="/portfolio">
               View all our work <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
           }
         />
-        <div className="project-grid">
-          {projects.map((p) => (
-            <ProjectCard key={p.slug} project={p} />
-          ))}
+        <div className="project-grid project-grid--clients">
+          {projects
+            .filter((p) => p.kind === "client")
+            .map((p) => (
+              <ProjectCard key={p.slug} project={p} headingLevel={3} />
+            ))}
         </div>
       </div>
     </section>
   );
 }
-export function WebsiteFAQ() {
+export async function WebsiteFAQ({ compact = false }: { compact?: boolean }) {
+  const settings = await getSiteSettings();
+  const websiteFAQs = settings.websiteFaqs.map((f) => [
+    f.question,
+    expandPriceTokens(f.answer, settings),
+  ]);
+  const visible = compact
+    ? websiteFAQs.filter(([q]) =>
+        [
+          "How much does a business website cost?",
+          "How long does a website take to build?",
+          "Do we need to buy a domain?",
+        ].includes(q),
+      )
+    : websiteFAQs;
   return (
     <div className="faq-list">
-      {websiteFAQs.map(([q, a]) => (
+      {visible.map(([q, a]) => (
         <details className="faq-item" key={q}>
           <summary>{q}</summary>
           <p>{a}</p>
@@ -61,12 +84,13 @@ export function WebsiteFAQ() {
     </div>
   );
 }
-export function IndustriesList() {
+export function IndustriesList({ headingLevel = 2 }: { headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 3 ? "h3" : "h2";
   return (
     <div className="industry-grid">
       {industries.map(([name, text]) => (
         <article key={name}>
-          <h3>{name}</h3>
+          <Heading>{name}</Heading>
           <p>{text}</p>
         </article>
       ))}

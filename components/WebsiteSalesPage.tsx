@@ -1,16 +1,19 @@
+import {
+  WebsiteCapabilities,
+  HandoverDecisions,
+} from "@/components/WebsiteCapabilities";
+import { websiteHostingOffer } from "@/config/business";
 import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
 import { StartProjectLink } from "@/components/ContactLinks";
-import {
-  Solutions,
-  WorkPreview,
-  WebsiteFAQ,
-  Standards,
-} from "@/components/WebsiteSections";
-import { ProcessSteps } from "@/components/ProcessSteps";
+import { WebsiteFAQ, Solutions } from "@/components/WebsiteSections";
 import { PackageGrid } from "@/components/PackageGrid";
 import { ClosingCTA } from "@/components/ClosingCTA";
 import { getSiteUrl } from "@/lib/site";
+import { BreadcrumbTrail } from "@/components/PageIntro";
+import { SectionHeading } from "@/components/SectionHeading";
+import { ProcessSteps } from "@/components/ProcessSteps";
+import { WebsiteFitGuide } from "@/components/CustomerJourney";
 export function WebsiteSalesPage({
   kind,
 }: {
@@ -19,7 +22,7 @@ export function WebsiteSalesPage({
   const content = {
     main: {
       eyebrow: "Website development in Nigeria",
-      title: "Your business, with a proper home online.",
+      title: "Professional website development for Nigerian businesses.",
       intro:
         "Turn scattered information into a professional website. Give customers one place to understand your offer, explore what you sell and take the next step.",
       problem: "Don’t make customers piece your business together.",
@@ -34,7 +37,7 @@ export function WebsiteSalesPage({
       ],
     },
     business: {
-      eyebrow: "Business website design",
+      eyebrow: "Business website design for Nigerian SMEs",
       title: "Make your business easier to understand. And easier to contact.",
       intro:
         "A professional website for small and growing Nigerian businesses. Present your services, answer customers’ first questions and turn interest into a useful enquiry.",
@@ -50,7 +53,7 @@ export function WebsiteSalesPage({
       ],
     },
     ecommerce: {
-      eyebrow: "E-commerce website development",
+      eyebrow: "E-commerce website development in Nigeria",
       title: "From a product people love to a store they can use.",
       intro:
         "Give your products a clear online shopfront. We plan product browsing, ordering and checkout around the way your business actually sells and fulfils orders.",
@@ -99,7 +102,7 @@ export function WebsiteSalesPage({
     ],
   };
   return (
-    <>
+    <div className="professional-sales-page">
       {url && (
         <script
           type="application/ld+json"
@@ -109,6 +112,22 @@ export function WebsiteSalesPage({
         />
       )}
       <section className="page-hero page-hero--green">
+        <div className="container">
+          <BreadcrumbTrail
+            schema={false}
+            items={[
+              {
+                name:
+                  kind === "main"
+                    ? "Website development"
+                    : kind === "business"
+                      ? "Business websites"
+                      : "E-commerce websites",
+                path,
+              },
+            ]}
+          />
+        </div>
         <div className="container page-hero__grid">
           <div>
             <span className="eyebrow">{content.eyebrow}</span>
@@ -116,9 +135,6 @@ export function WebsiteSalesPage({
             <p>{content.intro}</p>
             <div className="hero-actions">
               <StartProjectLink />
-              <Link className="button button--light" href="/portfolio">
-                Explore the concepts <ArrowRight size={16} aria-hidden="true" />
-              </Link>
             </div>
           </div>
           <aside className="page-hero__aside">
@@ -128,9 +144,7 @@ export function WebsiteSalesPage({
           </aside>
         </div>
       </section>
-      <div className="container">
-        <Standards />
-      </div>
+
       <section className="section">
         <div className="container service-detail-grid">
           <div>
@@ -159,8 +173,8 @@ export function WebsiteSalesPage({
                 renewals.
               </li>
               <li>
-                Domain, hosting, email and paid tools are separate unless
-                explicitly included.
+                {websiteHostingOffer.summary} {websiteHostingOffer.renewals}{" "}
+                Email and paid tools are separate unless explicitly included.
               </li>
               <li>
                 You supply approved content and licensed images unless creation
@@ -178,36 +192,56 @@ export function WebsiteSalesPage({
                 fulfilment setup.
               </p>
             )}
-            <Link className="text-link" href="/pricing">
+            <Link className="text-link mt-24" href="/portfolio">
+              Explore our published projects{" "}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+            <Link className="text-link mt-24" href="/pricing">
               Explore quotation options{" "}
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </aside>
         </div>
       </section>
+      <section
+        className="section section--soft"
+        id="website-capabilities"
+        aria-label="Website capabilities and agreed scope"
+      >
+        <div className="container">
+          <WebsiteCapabilities kind={kind} />
+        </div>
+      </section>
       {kind === "main" && (
         <section className="section section--soft">
           <div className="container">
-            <h2 className="mb-32">One service. Several useful solutions.</h2>
+            <SectionHeading
+              eyebrow="Website solutions"
+              title="Start with what your website needs to do."
+              description="A business introduction, product catalogue, online store or campaign page each needs a different structure. We agree the right direction with you."
+            />
             <Solutions />
           </div>
         </section>
       )}
-      <WorkPreview />
+      <section className="section section--mint">
+        <div className="container">
+          <SectionHeading
+            eyebrow="A clear route to launch"
+            title="Understand the plan before the build begins."
+            description="Your goals, content and required functionality shape the scope. We confirm responsibilities, timing and payment milestones before starting."
+          />
+          <ProcessSteps />
+        </div>
+      </section>
       <section className="section">
         <div className="container">
-          <span className="eyebrow">How your website takes shape</span>
-          <h2 className="mt-24 mb-32">Agreed together. Built with care.</h2>
-          <ProcessSteps />
-          <p className="form-fineprint mt-24">
-            Delivery estimates depend on scope, content readiness, feedback and
-            integrations. No ranking or sales outcome is guaranteed.
-          </p>
+          <PackageGrid heading />
         </div>
       </section>
       <section className="section section--soft">
         <div className="container">
-          <PackageGrid heading />
+          <WebsiteFitGuide />
         </div>
       </section>
       <section className="section">
@@ -223,11 +257,16 @@ export function WebsiteSalesPage({
           <WebsiteFAQ />
         </div>
       </section>
+      <section className="section section--soft">
+        <div className="container">
+          <HandoverDecisions />
+        </div>
+      </section>
       <section className="section section--compact">
         <div className="container">
           <ClosingCTA />
         </div>
       </section>
-    </>
+    </div>
   );
 }

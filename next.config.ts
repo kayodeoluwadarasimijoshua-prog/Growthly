@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
+import { isPublicIndexingEnabled } from "./lib/indexing";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  // Revocable/private proxies must never be copied into Next's shared image cache,
+  // including through a manually constructed /_next/image URL.
+  images: { localPatterns: [{ pathname: "/images/projects/**", search: "" }] },
   allowedDevOrigins: ["*.e2b.app", "*.arena.ai"],
   async redirects() {
     const configuredSite = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -27,10 +31,16 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     const headers = [
-      ...(process.env.SITE_INDEXING_ENABLED !== "true"
+      ...(!isPublicIndexingEnabled()
         ? [{ key: "X-Robots-Tag", value: "noindex, nofollow" }]
         : []),
       { key: "X-Content-Type-Options", value: "nosniff" },
+      // Resource restrictions that work with static Next scripts and the embedded
+      // preview. Framing restrictions remain scoped to the production hostname.
+      {
+        key: "Content-Security-Policy",
+        value: "object-src 'none'; base-uri 'self'; form-action 'self';",
+      },
       { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
       {
         key: "Permissions-Policy",
@@ -39,7 +49,21 @@ const nextConfig: NextConfig = {
     ];
     const rules: Awaited<ReturnType<NonNullable<NextConfig["headers"]>>> = [
       { source: "/:path*", headers },
+      // Also cover framework-generated errors (e.g. 405), not just handler responses.
+      {
+        source: "/api/:path*",
+        headers: [{ key: "Cache-Control", value: "private, no-store" }],
+      },
+      // Preserve the native-form safety net’s stricter policy over the global default.
+      {
+        source: "/api/inquiries/fallback",
+        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+      },
     ];
+    rules.push({
+      source: "/review-media/:path*",
+      headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+    });
     const configuredSite = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
     if (
@@ -63,7 +87,8 @@ const nextConfig: NextConfig = {
             headers: [
               {
                 key: "Content-Security-Policy",
-                value: "frame-ancestors 'none';",
+                value:
+                  "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';",
               },
               { key: "X-Frame-Options", value: "DENY" },
             ],

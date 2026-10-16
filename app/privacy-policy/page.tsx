@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { business } from "@/config/business";
+import { BreadcrumbTrail } from "@/components/PageIntro";
+import { getSiteSettings } from "@/lib/cms/public";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata(
@@ -8,10 +9,16 @@ export const metadata: Metadata = pageMetadata(
   "/privacy-policy",
 );
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const settings = await getSiteSettings();
   return (
     <>
       <section className="page-hero">
+        <div className="container">
+          <BreadcrumbTrail
+            items={[{ name: "Privacy notice", path: "/privacy-policy" }]}
+          />
+        </div>
         <div className="container page-hero__grid">
           <div>
             <span className="eyebrow">Privacy</span>
@@ -22,7 +29,7 @@ export default function PrivacyPage() {
             </p>
           </div>
           <div className="page-hero__aside">
-            <strong>Last updated</strong>13 October 2026
+            <strong>Last updated</strong>15 October 2026
           </div>
         </div>
       </section>
@@ -30,7 +37,7 @@ export default function PrivacyPage() {
         <div className="container legal-content">
           <aside className="legal-content__aside">
             <strong>Your enquiry, your choice</strong>
-            Share only what is needed to discuss your website. You can contact
+            Share only what is needed to discuss your project. You can contact
             GROWTHLY to request correction or removal of your enquiry details.
           </aside>
           <div className="legal-content__body">
@@ -39,9 +46,30 @@ export default function PrivacyPage() {
               <p>
                 GROWTHLY is responsible for handling enquiries sent through this
                 website. Contact the business using WhatsApp at{" "}
-                {business.contact.whatsapp} or phone at{" "}
-                {business.contact.alternativePhone} if you have a privacy
-                question.
+                {settings.whatsapp} or phone at {settings.alternativePhone} if
+                you have a privacy question.
+              </p>
+            </section>
+            <section>
+              <h2>Project images</h2>
+              <p>
+                Project screenshots, when approved for publication, are served
+                from this website rather than loaded from a client’s website.
+                Permission-pending screenshots remain unavailable in the normal
+                public build. Opening a project’s live-site link takes you to
+                that site, where its own privacy terms apply.
+              </p>
+            </section>
+            <section>
+              <h2>Movable WhatsApp button</h2>
+              <p>
+                The floating WhatsApp button saves only its screen position in
+                your browser’s local storage so it stays where you move it. This
+                preference is not sent to Growthly or analytics and contains no
+                enquiry details. Clear the site’s browser storage to remove it,
+                or focus the button and press Home to reset its position.
+                Opening the link takes you to WhatsApp; a message is not sent
+                until you send it there.
               </p>
             </section>
             <section>
@@ -50,8 +78,12 @@ export default function PrivacyPage() {
                 The project form asks for your name, business name, contact
                 details, preferred contact method, service, package choice,
                 budget range, timing and project description. It also stores
-                optional campaign-source values (UTM parameters) when present in
-                the page URL.
+                optional campaign-source values (UTM parameters) only when
+                analytics is enabled and you have opted in. In WhatsApp-only
+                mode, details stay in your browser until you open the prepared
+                WhatsApp link, which shares the message with WhatsApp. You must
+                send it there to contact GROWTHLY; preparing it does not submit
+                an online enquiry.
               </p>
               <p>
                 Please do not submit passwords, financial account credentials,
@@ -105,50 +137,66 @@ export default function PrivacyPage() {
             <section>
               <h2>Optional analytics</h2>
               <p>
-                Google Analytics 4 or Google Ads tags load only when the site
-                owner has configured an integration and you choose “Allow
+                Google Analytics 4 loads only after the site owner has reviewed
+                and explicitly enabled analytics and you choose “Allow
                 analytics” in the optional analytics prompt. You can decline
                 without affecting the project form or site content. If enabled,
                 the site records page views, service calls to action, WhatsApp
                 or phone clicks and successful form submissions. No names,
                 contact details, budget details or project descriptions are
-                attached to those analytics events.
+                attached to the site’s manually recorded analytics events.
+                Google Ads tags and advertising personalization are not enabled
+                by this prompt. Provider automatic-measurement settings must be
+                reviewed before analytics is enabled.
               </p>
               <p>
                 Your analytics choice is stored in this browser’s local storage.
-                Use “Privacy preferences” in the footer to change or withdraw
-                that choice.
+                If browser storage is blocked, the choice lasts for the current
+                page session. Use “Privacy preferences” in the footer to change
+                or withdraw that choice.
               </p>
             </section>
             <section>
               <h2>Retention and your choices</h2>
               <p>
-                The website does not currently apply an automatic deletion
-                schedule to lead records. The business owner must set and follow
-                a retention period, remove records that are no longer needed and
-                keep database backups secure. You may ask GROWTHLY to correct or
-                remove enquiry details by contacting the numbers above, subject
-                to applicable record-keeping requirements.
+                Enquiry records are not deleted automatically. Contact GROWTHLY
+                using the numbers above to request a review, correction or
+                removal of your details. Some information may need to be kept
+                for an ongoing project or applicable record-keeping
+                requirements. Avoid sending information that is not needed for
+                your enquiry.
+              </p>
+            </section>
+            <section>
+              <h2>Assistance with enquiries</h2>
+              <p>
+                If GROWTHLY authorises an assistant to help with your enquiry,
+                only information needed for the assigned task should be shared.
+                Assistants must follow confidentiality instructions and must not
+                use your details for their own marketing, upload them to
+                personal AI tools or pass them to unrelated clients. You may ask
+                to discuss sensitive matters directly with the business owner.
+                This does not mean an assistant has access to all website
+                records or accounts.
               </p>
             </section>
             <section>
               <h2>Security</h2>
               <p>
-                Administrative lead access is designed to require authenticated
-                Supabase users with an administrator role, with database
-                row-level security enabled. Server credentials must remain in
-                the hosting platform’s environment settings and must never be
-                placed in browser code. The site owner is responsible for
-                account access, backups, provider configuration and responding
-                to security incidents.
+                The website is designed to keep private lead records behind
+                authenticated administrator access, with server credentials kept
+                out of browser code. An assistant must not be given the owner's
+                administrator login just to help with enquiries. Account and
+                provider settings require separate access checks; no website can
+                guarantee that every device or external service is risk-free.
               </p>
             </section>
             <section>
               <h2>Updates</h2>
               <p>
-                This notice may change when the website’s data providers or
-                business processes change. Review it before launch and whenever
-                a service integration is added or replaced.
+                This notice may change when our enquiry workflow or providers
+                change. The date above identifies this version. Contact GROWTHLY
+                if you have a question about how your information is handled.
               </p>
             </section>
           </div>
