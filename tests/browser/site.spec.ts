@@ -328,7 +328,8 @@ test("one consistent sales action and supplied-logo rendition", async ({
       );
     }
     if (route === "/") {
-      await expect(page.locator(".hero-actions a")).toHaveCount(1);
+      await expect(page.locator(".hero-actions a.button--primary")).toHaveCount(1);
+      await expect(page.locator('.hero-actions a[href="#our-work"]')).toHaveText("See our work");
       await expect(page.locator(".closing-cta a")).toHaveCount(1);
       await expect(page.locator(".hero-project .project-card")).toHaveCount(1);
     }
@@ -530,7 +531,7 @@ test("floating WhatsApp handles touch dragging and avoids consent controls", asy
   expect(position.y + position.height).toBeLessThanOrEqual(banner.y - 16);
 });
 
-test("full homepage hierarchy, real work only and useful CTA spacing", async ({
+test("focused homepage keeps useful decisions, real work and accessible detail", async ({
   page,
 }) => {
   for (const width of [390, 1440]) {
@@ -538,7 +539,6 @@ test("full homepage hierarchy, real work only and useful CTA spacing", async ({
     await page.goto("/");
     for (const id of [
       "website-solutions",
-      "why-growthly",
       "our-work",
       "packages",
       "our-process",
@@ -547,11 +547,22 @@ test("full homepage hierarchy, real work only and useful CTA spacing", async ({
       await expect(page.locator(`#${id}`)).toHaveCount(1);
       await expect(page.locator(`.journey-nav a[href="#${id}"]`)).toBeVisible();
     }
-    await expect(page.locator(".solution-card")).toHaveCount(7);
+    await expect(page.locator(".fit-choice")).toHaveCount(3);
     await expect(page.locator(".project-card")).toHaveCount(1);
     await expect(page.locator(".hero-project h2")).toHaveText("StarXCO");
     await expect(page.locator("#our-process .process-step")).toHaveCount(4);
-    await expect(page.locator("#questions .faq-item")).toHaveCount(11);
+    await expect(page.locator("#questions .faq-item")).toHaveCount(6);
+    await expect(page.locator("#why-growthly")).toContainText(
+      "agreed in writing",
+    );
+    await expect(page.locator("#website-features")).not.toHaveAttribute(
+      "open",
+      "",
+    );
+    await page.locator("#website-features > summary").click();
+    await expect(page.locator("#website-features .capability-row")).toHaveCount(
+      4,
+    );
     const text = await page.locator("main").innerText();
     for (const name of [
       "Daily Life Review",

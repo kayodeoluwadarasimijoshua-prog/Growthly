@@ -61,6 +61,17 @@ export default async function PrivacyPage() {
               </p>
             </section>
             <section>
+              <h2>Team profiles and photos</h2>
+              <p>
+                The About page publishes team names, responsibilities and
+                optional photos reviewed for publication by Growthly. Draft
+                profiles and uploads stay private. Contact Growthly using the
+                details above to request a correction or removal. Being listed
+                on the website does not give a person access to customer
+                enquiries or administrator accounts.
+              </p>
+            </section>
+            <section>
               <h2>Movable WhatsApp button</h2>
               <p>
                 The floating WhatsApp button saves only its screen position in

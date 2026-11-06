@@ -69,7 +69,7 @@ for (const service of servicePages.filter(
     ).toHaveValue("");
     await expect(page.locator("header .header-actions > a")).toHaveAttribute(
       "href",
-      "#main-content",
+      "#project-brief",
     );
   });
 }
@@ -130,19 +130,22 @@ test("service destinations work without scripts and without a mixed website quot
   }
 });
 
-test("home and overview expose five separate service sections without replacing website focus", async ({
+test("home links to every service and the overview retains each full service scope", async ({
   page,
 }) => {
-  for (const path of ["/", "/services"]) {
-    await page.goto(path);
-    await expect(page.locator(".supporting-service-section")).toHaveCount(5);
-    for (const service of servicePages.filter(
-      (p) => p.slug !== "website-development",
-    )) {
-      await expect(
-        page.locator(`#support-${service.slug} > div > a`),
-      ).toHaveAttribute("href", service.path);
-    }
+  await page.goto("/");
+  for (const service of servicePages)
+    await expect(
+      page.locator(`.service-gateway__card[href="${service.path}"]`),
+    ).toBeVisible();
+  await page.goto("/services");
+  await expect(page.locator(".supporting-service-section")).toHaveCount(5);
+  for (const service of servicePages.filter(
+    (p) => p.slug !== "website-development",
+  )) {
+    await expect(
+      page.locator(`#support-${service.slug} > div > a`),
+    ).toHaveAttribute("href", service.path);
   }
   await page.goto("/");
   await expect(page.locator(".hero-actions .button")).toHaveText(

@@ -14,6 +14,104 @@ test.beforeEach(async ({ page }) => {
     page.getByRole("heading", { name: "Website content", exact: true }),
   ).toBeVisible();
 });
+test("team profiles save privately, require permissions and support role templates", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "Team", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "About page team" }),
+  ).toBeVisible();
+  await page
+    .getByLabel("Team member biography", { exact: true })
+    .fill("Synthetic updated website responsibilities for the owner profile.");
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Draft saved");
+  expect((await state(page)).published).toBeNull();
+  await page
+    .getByRole("button", { name: "Add team member", exact: true })
+    .click();
+  await page
+    .getByLabel("Team member name", { exact: true })
+    .fill("Synthetic team member");
+  await page
+    .getByLabel("Role template", { exact: true })
+    .selectOption("Graphic Design");
+  await expect(
+    page.getByLabel("Team member role", { exact: true }),
+  ).toHaveValue("Graphic Design");
+  await page
+    .getByLabel("Team member biography", { exact: true })
+    .fill("A synthetic profile used only to verify editable team content.");
+  await page
+    .getByLabel("Include this team member on the next publication.", {
+      exact: true,
+    })
+    .check();
+  await page
+    .getByRole("button", { name: "Publish changes", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "permission to publish this profile",
+  );
+  await page
+    .getByLabel(
+      "I have reviewed this profile and have permission to publish it.",
+      { exact: true },
+    )
+    .check();
+  await page
+    .getByRole("button", { name: "Publish changes", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText("Published");
+  const current = await state(page);
+  expect(current.published.team.at(-1).name).toBe("Synthetic team member");
+  expect(current.published.team.at(-1)).not.toHaveProperty("admin");
+});
+
+test("team photos remain draft-only until their separate publication checks pass", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "Team", exact: true }).click();
+  await page.getByLabel("Upload team photo", { exact: true }).setInputFiles({
+    name: "synthetic-profile.webp",
+    mimeType: "image/webp",
+    buffer: Buffer.from(
+      "UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEAAUAmJaQAA3AA/v89WAAAAA==",
+      "base64",
+    ),
+  });
+  await expect(page.getByRole("status")).toContainText("stored privately");
+  await page
+    .getByRole("button", { name: "Publish changes", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText("photo alt text");
+  await page
+    .getByLabel("Team photo description", { exact: true })
+    .fill("Synthetic profile portrait for testing");
+  await page
+    .getByLabel("Team photo source credit", { exact: true })
+    .fill("Synthetic local fixture");
+  await page
+    .getByLabel("I have permission to publish this team photo.", {
+      exact: true,
+    })
+    .check();
+  await page
+    .getByRole("button", { name: "Publish changes", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText("Published");
+  expect((await state(page)).published.team[0].image.permissionConfirmed).toBe(
+    true,
+  );
+  await page
+    .getByRole("button", { name: "Move team member later", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Draft saved");
+  const current = await state(page);
+  expect(current.draft.team[0].name).toBe("Kenny");
+  expect(current.published.team[0].name).toBe("Kayode Oluwadarasimi");
+});
 async function completeProject(page: Page) {
   await page.getByRole("button", { name: "Add project", exact: true }).click();
   await page
@@ -208,6 +306,7 @@ for (const width of [375, 768, 1440])
     await page.setViewportSize({ width, height: 900 });
     for (const name of [
       "Projects",
+      "Team",
       "Contact & pricing",
       "Page text",
       "FAQs",

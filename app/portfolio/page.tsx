@@ -7,10 +7,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { ClosingCTA } from "@/components/ClosingCTA";
 import { PageIntro } from "@/components/PageIntro";
 import { SectionHeading } from "@/components/SectionHeading";
-import {
-  IndependentWebsiteExamples,
-  ProjectPreparation,
-} from "@/components/CustomerJourney";
+import { IndependentWebsiteExamples } from "@/components/CustomerJourney";
 export const metadata = pageMetadata(
   seoPages.portfolio.title,
   seoPages.portfolio.description,
@@ -23,9 +20,9 @@ export default async function PortfolioPage() {
       <PageIntro
         label="Our work"
         path="/portfolio"
-        eyebrow="Published work & useful directions"
-        title="Real work. Clear ideas for what comes next."
-        description="Explore published Growthly work, understand the decisions behind it and use clearly labelled independent references to discuss your project."
+        eyebrow="Published Growthly work"
+        title="See the work. Understand the decisions."
+        description="Explore Growthly’s published projects, the work delivered and the decisions behind each website. Start with the actual scope, then discuss what your business needs."
         aside={
           <>
             <strong>Work and inspiration stay separate.</strong>Client projects
@@ -79,55 +76,14 @@ export default async function PortfolioPage() {
         aria-label="Independent website inspiration"
       >
         <div className="container">
-          <IndependentWebsiteExamples />
-        </div>
-      </section>
-      <section className="section">
-        <div className="container">
-          <ProjectPreparation />
-          <div className="section-footer">
-            <p>
-              Have a website you like? Share the public link and tell us which
-              details are useful—not just “make it exactly the same”.
-            </p>
-            <Link className="text-link" href="/contact">
-              Discuss your website direction{" "}
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </section>
-      <section className="section section--soft">
-        <div className="container">
-          <SectionHeading
-            eyebrow="Turn a reference into a useful brief"
-            title="Tell us what works for your customers—not just which website looks good."
-            description="A reference is a conversation aid. Your website should have its own content, identity and realistic scope."
-          />
-          <div className="outcome-grid">
-            {[
-              [
-                "Identify the detail you like",
-                "Is it the service explanation, product categorisation, programme information or contact route? A specific observation is more useful than asking for a whole site to be copied.",
-              ],
-              [
-                "Explain the job it needs to do",
-                "Tell us who would use that feature and what they need to find or complete. A useful information pattern may transfer without needing the reference site’s entire platform.",
-              ],
-              [
-                "Separate design from functionality",
-                "A similar layout does not mean the same payment system, account portal, inventory tools or integrations. We assess those requirements and costs independently before committing.",
-              ],
-            ].map(([title, text], index) => (
-              <article className="outcome-card" key={title}>
-                <span className="editorial-number" aria-hidden="true">
-                  0{index + 1}
-                </span>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
-          </div>
+          <details className="home-feature-guide portfolio-inspiration">
+            <summary>
+              Independent website references — not Growthly projects
+            </summary>
+            <div className="home-feature-guide__body">
+              <IndependentWebsiteExamples />
+            </div>
+          </details>
         </div>
       </section>
       <section className="section section--compact">

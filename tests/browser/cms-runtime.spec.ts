@@ -47,6 +47,43 @@ test.beforeEach(async ({ request }) => {
     data: { published: doc() },
   });
 });
+test("published team edits appear without rebuilds and withdrawn portraits stop serving", async ({
+  page,
+  request,
+}) => {
+  const document = doc();
+  const photoId = "22222222-2222-4222-8222-222222222222";
+  document.team[0].name = "Synthetic published team owner";
+  document.team[0].image = {
+    assetId: photoId,
+    width: 1,
+    height: 1,
+    alt: "Synthetic owner portrait",
+    credit: "Synthetic fixture only",
+    permissionConfirmed: true,
+  };
+  await request.post(`${base}/__cms_test/control`, { data: { document } });
+  await page.goto(`${runtime}/about`);
+  await expect(page.locator("#our-team")).toContainText(
+    "Synthetic published team owner",
+  );
+  await expect(page.locator(".team-card__photo")).toHaveAttribute(
+    "alt",
+    "Synthetic owner portrait",
+  );
+  const photo = await request.get(`${runtime}/media/projects/${photoId}`);
+  expect(photo.status()).toBe(200);
+  expect(photo.headers()["cache-control"]).toContain("no-store");
+  document.team[0].published = false;
+  await request.post(`${base}/__cms_test/control`, { data: { document } });
+  await page.reload();
+  await expect(page.locator("#our-team")).not.toContainText(
+    "Synthetic published team owner",
+  );
+  expect(
+    (await request.get(`${runtime}/media/projects/${photoId}`)).status(),
+  ).toBe(404);
+});
 test("new published project URLs, accurate demonstration labels, sitemap and HTML exclude private drafts", async ({
   page,
   request,
@@ -67,10 +104,9 @@ test("new published project URLs, accurate demonstration labels, sitemap and HTM
     "href",
     "/request-a-quote?service=graphic-design",
   );
-  await expect(page.locator(".site-header .header-actions .button")).toHaveAttribute(
-    "href",
-    "/request-a-quote?service=graphic-design",
-  );
+  await expect(
+    page.locator(".site-header .header-actions .button"),
+  ).toHaveAttribute("href", "/request-a-quote?service=graphic-design");
   await expect(page.locator(".floating-whatsapp")).toHaveAttribute(
     "href",
     /graphic%20design/i,

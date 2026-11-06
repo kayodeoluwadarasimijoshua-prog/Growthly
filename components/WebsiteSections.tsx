@@ -58,7 +58,13 @@ export async function WorkPreview() {
     </section>
   );
 }
-export async function WebsiteFAQ({ compact = false }: { compact?: boolean }) {
+export async function WebsiteFAQ({
+  compact = false,
+  limit,
+}: {
+  compact?: boolean;
+  limit?: number;
+}) {
   const settings = await getSiteSettings();
   const websiteFAQs = settings.websiteFaqs.map((f) => [
     f.question,
@@ -75,7 +81,7 @@ export async function WebsiteFAQ({ compact = false }: { compact?: boolean }) {
     : websiteFAQs;
   return (
     <div className="faq-list">
-      {visible.map(([q, a]) => (
+      {visible.slice(0, limit).map(([q, a]) => (
         <details className="faq-item" key={q}>
           <summary>{q}</summary>
           <p>{a}</p>

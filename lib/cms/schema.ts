@@ -84,6 +84,17 @@ export const cmsProjectSchema = z
     featured: z.boolean(),
   })
   .strict();
+export const cmsTeamMemberSchema = z
+  .object({
+    id: z.string().regex(/^[a-z0-9-]{3,80}$/),
+    name: text(100, 0),
+    role: text(160, 0),
+    bio: text(700, 0),
+    image: cmsImageSchema.nullable(),
+    published: z.boolean(),
+    publicationConfirmed: z.boolean(),
+  })
+  .strict();
 const faq = z
   .object({ question: text(200, 5), answer: text(1600, 5) })
   .strict();
@@ -123,9 +134,18 @@ export const cmsDocumentSchema = z
   .object({
     settings: cmsSettingsSchema,
     projects: z.array(cmsProjectSchema).max(50),
+    // Older stored documents have no team field. Never resurrect withdrawn
+    // people from code defaults when the owner is using stored publications.
+    team: z.array(cmsTeamMemberSchema).max(12).default([]),
   })
   .strict()
   .superRefine((d, ctx) => {
+    if (new Set(d.team.map((m) => m.id)).size !== d.team.length)
+      ctx.addIssue({
+        code: "custom",
+        message: "Each team member id must be unique.",
+        path: ["team"],
+      });
     for (const key of ["id", "slug"] as const)
       if (new Set(d.projects.map((p) => p[key])).size !== d.projects.length)
         ctx.addIssue({
@@ -154,11 +174,40 @@ export const cmsDocumentSchema = z
 export type CmsDocument = z.infer<typeof cmsDocumentSchema>;
 export type CmsSettings = z.infer<typeof cmsSettingsSchema>;
 export type CmsProject = z.infer<typeof cmsProjectSchema>;
+export type CmsTeamMember = z.infer<typeof cmsTeamMemberSchema>;
 export function publicationIssues(
   doc: CmsDocument,
   previous: CmsDocument | null,
 ) {
   const errors: string[] = [];
+  for (const member of doc.team) {
+    if (!member.published) continue;
+    if (!member.name || !member.role || member.bio.length < 10)
+      errors.push(
+        `${member.name || "Team member"}: complete the name, role and short biography before publishing.`,
+      );
+    if (
+      member.bio.includes(
+        "Add the person's actual responsibilities before publishing.",
+      )
+    )
+      errors.push(
+        `${member.name || "Team member"}: replace the template guidance with a factual biography before publishing.`,
+      );
+    if (!member.publicationConfirmed)
+      errors.push(
+        `${member.name || "Team member"}: confirm permission to publish this profile.`,
+      );
+    if (
+      member.image &&
+      (!member.image.permissionConfirmed ||
+        member.image.alt.length < 5 ||
+        member.image.credit.length < 5)
+    )
+      errors.push(
+        `${member.name || "Team member"}: add photo alt text, source credit and publication permission, or remove the photo.`,
+      );
+  }
   for (const p of doc.projects) {
     if (
       p.published &&

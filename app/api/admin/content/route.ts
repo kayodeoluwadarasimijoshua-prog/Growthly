@@ -139,6 +139,10 @@ export async function POST(request: NextRequest) {
         p.publicationConfirmed = false;
         if (p.image) p.image.permissionConfirmed = false;
       });
+      document.team.forEach((member) => {
+        member.publicationConfirmed = false;
+        if (member.image) member.image.permissionConfirmed = false;
+      });
     }
     if (!document)
       return privateJson(
@@ -157,7 +161,7 @@ export async function POST(request: NextRequest) {
         issues.push(
           "Confirm that you reviewed all three starting prices before publishing.",
         );
-      const images = document.projects
+      const images = [...document.projects, ...document.team]
         .filter((p) => p.published && p.image)
         .map((p) => p.image!);
       if (images.length) {
@@ -186,7 +190,9 @@ export async function POST(request: NextRequest) {
                 m.storage_path === `${image.assetId}.webp`,
             )
           )
-            issues.push("A project image is not registered. Upload it again.");
+            issues.push(
+              "A project or team image is not registered. Upload it again.",
+            );
       }
       if (issues.length)
         return privateJson(

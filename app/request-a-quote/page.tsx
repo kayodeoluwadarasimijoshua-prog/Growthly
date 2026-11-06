@@ -49,7 +49,7 @@ export default async function Page({
         process.env.LEADS_EMAIL,
       ));
   return (
-    <div className="short-sales-page">
+    <div className="short-sales-page quote-sales-page">
       <FloatingWhatsApp
         contextualService={getServicePage(service.slug)}
         pageScoped
@@ -70,35 +70,20 @@ export default async function Page({
             </h1>
             <p>
               {isWebsite
-                ? "Tell us about your business. We’ll help you find a practical website solution and agree the details before you commit."
+                ? "Tell us what your website needs to do. We’ll review your requirements and agree a written scope and quote."
                 : `Share what you need from ${sentenceServiceName(service.shortTitle)}. We’ll review your goals and agree a written scope before you commit.`}
             </p>
           </div>
-          <div className="page-hero__aside">
-            <strong>A conversation, not a checkout.</strong>No payment is
-            collected here. Final scope, pricing, revisions and delivery timing
-            are agreed in your written proposal.
-          </div>
+          <p className="quote-channel-note">
+            {deliveryEnabled
+              ? "Send your brief through our configured enquiry system."
+              : "This form prepares a WhatsApp message. Review it and press Send in WhatsApp to contact us."}{" "}
+            No payment is collected here.
+          </p>
         </div>
       </section>
       <section className="section">
         <div className="container form-layout">
-          <aside className="form-layout__aside">
-            <span className="eyebrow">What happens next</span>
-            <h2>A brief. A conversation. A clear proposal.</h2>
-            <p>
-              Once your brief is delivered, we review your requirements and
-              follow up. We discuss{" "}
-              {isWebsite ? "the website’s purpose" : "your project goals"},
-              agree a suitable scope and confirm the cost and payment
-              milestones.
-            </p>
-            <div className="concept-note mt-24">
-              Please don’t include passwords, financial credentials or sensitive
-              personal data. Use a business contact number you are comfortable
-              sharing.
-            </div>
-          </aside>
           <div className="quote-form-column">
             <p className="quote-contact-options" id="quote-contact-options">
               Questions before your brief?{" "}
@@ -145,6 +130,22 @@ export default async function Page({
               deliveryEnabled={deliveryEnabled}
             />
           </div>
+          <aside className="form-layout__aside">
+            <span className="eyebrow">What happens next</span>
+            <h2>A brief. A conversation. A clear proposal.</h2>
+            <p>
+              Once your brief is delivered, we review your requirements and
+              follow up. We discuss{" "}
+              {isWebsite ? "the website’s purpose" : "your project goals"},
+              agree a suitable scope and confirm the cost and payment
+              milestones.
+            </p>
+            <div className="concept-note mt-24">
+              Please don’t include passwords, financial credentials or sensitive
+              personal data. Use a business contact number you are comfortable
+              sharing.
+            </div>
+          </aside>
         </div>
       </section>
     </div>

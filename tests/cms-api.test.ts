@@ -97,6 +97,41 @@ function req(data: unknown, origin = "https://growthly.com.ng") {
   });
 }
 describe("private content API (provider mocks, not a live account)", () => {
+  it("rejects unregistered team photos and clears profile/photo permissions on restoration", async () => {
+    draft.team[0].image = {
+      assetId: "22222222-2222-4222-8222-222222222222",
+      width: 100,
+      height: 100,
+      alt: "Synthetic team portrait",
+      credit: "Synthetic fixture",
+      permissionConfirmed: true,
+    };
+    const rejected = await POST(
+      req({ action: "publish", expectedRevision: 0, document: draft }),
+    );
+    expect(rejected.status).toBe(400);
+    expect((await rejected.json()).issues.join(" ")).toContain(
+      "not registered",
+    );
+    expect(mocks.rpc).not.toHaveBeenCalled();
+    expect(
+      (
+        await POST(
+          req({ action: "save", expectedRevision: 0, document: draft }),
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await POST(
+          req({ action: "restore", expectedRevision: 1, restoreRevision: 1 }),
+        )
+      ).status,
+    ).toBe(200);
+    expect(draft.team[0].publicationConfirmed).toBe(false);
+    expect(draft.team[0].image?.permissionConfirmed).toBe(false);
+    expect(published).toBeNull();
+  });
   it("denies unauthenticated/assistant access and rejects cross-origin writes before reading content", async () => {
     expect((await POST(req({}, "https://untrusted.invalid"))).status).toBe(403);
     expect(mocks.auth).not.toHaveBeenCalled();

@@ -16,10 +16,10 @@ const summaries: Record<string, string> = {
 };
 
 /** A clear early choice, without changing the website-first hero or mixing service scopes. */
-export function ServiceGateway() {
+export function ServiceGateway({ compact = false }: { compact?: boolean }) {
   return (
     <section
-      className="service-gateway section--soft"
+      className={`service-gateway section--soft${compact ? " service-gateway--compact" : ""}`}
       id="choose-your-service"
       aria-labelledby="service-gateway-title"
     >

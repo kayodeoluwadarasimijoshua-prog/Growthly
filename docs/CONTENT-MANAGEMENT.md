@@ -1,5 +1,7 @@
 # Owner content management
 
+> **Team editor update:** see [the owner quickstart](OWNER-EDITOR-QUICKSTART.md) for team profiles, photos, role templates and the current setup boundary. The existing content document now supports an optional team list; older publications remain readable. Profile membership never grants account privileges.
+
 **Status — 15 October 2026:** implemented locally, not activated on a remote account or deployed. Real Supabase Auth, migrations, Storage and hosting still need owner-approved setup and acceptance. This coding session is closed for remote GitHub operations; start a new coding session for the one-time publication/setup. Ordinary supported content updates after that use the website editor, not coding sessions.
 
 ## What the owner can update
@@ -9,6 +11,7 @@ Sign in at **`/admin/login`**, then open **`/admin/content`** (also linked from 
 | Section | Editable information |
 | --- | --- |
 | Projects | Add/edit/remove/order work; name, URL slug, service, real client versus self-initiated demonstration, category, optional public website/video link, summary, delivered scope, purpose, design decisions, limitations, one image, permissions and Home spotlight |
+| Team | Add/edit/hide/remove/order About profiles, role templates, factual bios and optional photos with separate publication checks |
 | Contact & pricing | WhatsApp number, alternative phone, footer tagline and the three website starting prices |
 | Page text | Home headline/emphasis/introduction, About introduction and Contact introduction |
 | FAQs | Website FAQs shared by Home/website pages and separate FAQs for each supporting service |

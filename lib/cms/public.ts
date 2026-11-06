@@ -62,6 +62,12 @@ export async function requireContent() {
 export async function getSiteSettings() {
   return (await requireContent()).settings;
 }
+export async function getPublishedTeam() {
+  const document = await requireContent();
+  return document.team.filter(
+    (member) => member.published && member.publicationConfirmed,
+  );
+}
 export async function getPublishedProjects(): Promise<PortfolioProject[]> {
   const state = await getContentState();
   if (!state.available || !state.document)

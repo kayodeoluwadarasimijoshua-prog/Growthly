@@ -124,6 +124,10 @@ const fixture = () => ({
               p.publicationConfirmed = false;
               if (p.image) p.image.permissionConfirmed = false;
             }
+            for (const member of document.team ?? []) {
+              member.publicationConfirmed = false;
+              if (member.image) member.image.permissionConfirmed = false;
+            }
           } else {
             const parsed = schema.cmsDocumentSchema.safeParse(data.document);
             if (!parsed.success)
@@ -198,6 +202,7 @@ const server = await createServer({
     host: "0.0.0.0",
     port: 3001,
     strictPort: true,
+    watch: { ignored: ["**/.next/**", "**/artifacts/**", "**/test-results/**"] },
     allowedHosts: [".e2b.app", ".arena.ai", "localhost"],
   },
 });

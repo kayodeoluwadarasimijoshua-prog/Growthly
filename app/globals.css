@@ -3058,6 +3058,75 @@
 /* Retain every requested full section; trim only excess inter-section space. */
 .home-sales-page > .section { padding-block: clamp(44px,6vw,88px); }
 .home-sales-page > .section--compact { padding-block: 32px 48px; }
+
+/* Focus the homepage on choosing an offer, reviewing real work and enquiring. */
+.home-sales-page .website-hero { padding-block: clamp(32px, 5vw, 68px); }
+.home-sales-page .hero-grid { align-items: center; }
+.home-sales-page .hero-copy h1 { font-size: clamp(2.4rem, 4.6vw, 4.15rem); line-height: 1.1; }
+.home-sales-page .hero-copy > p { max-width: 57ch; }
+.home-sales-page .hero-actions { align-items: center; gap: 20px; }
+.home-sales-page .hero-actions .text-link { min-height: 44px; }
+.hero-proof-label { margin-bottom: 14px; font-size: 11px; }
+.hero-proof-scope { margin-top: 18px; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--white); }
+.hero-proof-scope h3 { font-size: 16px; letter-spacing: -.02em; }
+.hero-proof-scope ul { margin: 14px 0; padding-left: 20px; color: var(--muted); font-size: 14px; }
+.hero-proof-scope li + li { margin-top: 9px; }
+.hero-proof-scope > p { font-size: 13px; }
+.service-gateway--compact .service-gateway__card { padding: 18px 20px; }
+.service-gateway--compact .service-gateway__card h3 { margin-top: 12px; }
+.service-gateway--compact .service-gateway__card p { margin-block: 8px 12px; }
+.home-feature-guide { margin-top: 28px; border: 1px solid var(--line-dark); border-radius: var(--radius-md); background: var(--white); }
+.home-feature-guide > summary { padding: 20px; min-height: 48px; font-weight: 650; color: var(--green-dark); cursor: pointer; }
+.home-feature-guide__body { padding: 12px 24px 28px; }
+.home-detail-links { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 12px 28px; }
+.home-detail-links .text-link, .home-commitments > .text-link { min-height: 44px; }
+.home-commitments { margin-top: 36px; padding: 28px; border-radius: var(--radius-md); background: var(--soft); }
+.home-commitments h3 { font-size: 21px; }
+.home-commitments .check-list { margin-block: 18px; }
+
+/* The brief comes before repeated process copy in both DOM and mobile order. */
+.quote-sales-page .page-hero { padding-block: 22px 28px; }
+.quote-sales-page .page-hero__grid { grid-template-columns: 1fr; gap: 14px; }
+.quote-sales-page .page-hero h1 { font-size: clamp(2rem, 4vw, 3.5rem); margin-top: 14px; }
+.quote-sales-page .page-hero .eyebrow { margin-top: 16px; }
+.quote-sales-page .page-hero p { max-width: 65ch; font-size: 16px; }
+.quote-sales-page .quote-channel-note { color: var(--green-dark); font-size: 14px; }
+.quote-sales-page > .section { padding-top: 28px; }
+.quote-sales-page .form-layout { grid-template-columns: minmax(0, 1.35fr) minmax(250px, .65fr); gap: 48px; }
+.quote-sales-page .quote-contact-options { margin-bottom: 18px; }
+#project-brief { scroll-margin-top: 110px; }
+#project-brief:focus { outline: 3px solid var(--green-dark); outline-offset: 6px; }
+
+.team-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+.team-card { min-width: 0; background: var(--white); border: 1px solid var(--line); padding: 24px; border-radius: var(--radius-md); }
+.team-card__initials { display: grid; place-items: center; width: 76px; height: 76px; border-radius: 50%; background: var(--mint); color: var(--green-deep); font-size: 25px; font-weight: 650; margin-bottom: 22px; }
+.team-card__photo { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 12px; margin-bottom: 22px; }
+.team-card h3 { font-size: 22px; overflow-wrap: anywhere; }
+.team-card__role { color: var(--green-dark); font-size: 13px; font-weight: 650; margin-block: 12px; }
+.team-card > p { font-size: 14px; }
+.team-card > .team-card__credit { font-size: 12px; margin-top: 14px; }
+.cms-team-layout { margin-top: 24px; }
+.cms-team-layout aside > button + button { margin-top: 12px; }
+.cms-team-layout h4 { margin-top: 24px; }
+.cms-team-layout .cms-check { display: flex; align-items: start; gap: 12px; margin-block: 20px; }
+
+@media (max-width: 980px) {
+  .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quote-sales-page .form-layout { grid-template-columns: 1fr; gap: 32px; }
+}
+@media (max-width: 760px) {
+  .service-gateway--compact .service-gateway__card { padding: 14px; }
+  .service-gateway--compact .service-gateway__intro { margin-bottom: 20px; }
+  .hero-proof-scope { padding: 18px; }
+  .home-commitments { padding: 22px; }
+  .home-feature-guide__body { padding-inline: 16px; }
+  .quote-sales-page .page-hero h1 { font-size: 32px; }
+  .quote-sales-page .page-hero p { font-size: 15px; line-height: 1.6; }
+  .quote-sales-page .page-hero .quote-channel-note { font-size: 13px; }
+}
+@media (max-width: 520px) {
+  .team-grid { grid-template-columns: 1fr; }
+}
 .quote-contact-options { margin-bottom: 24px; font-size: 14px; }
 .quote-contact-options .text-link { white-space: normal; }
 

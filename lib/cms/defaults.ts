@@ -3,6 +3,7 @@ import { projects } from "@/config/content";
 import { websiteFAQs } from "@/config/websites";
 import { serviceMarketing } from "@/config/service-marketing";
 import { servicePages } from "@/config/service-pages";
+import { initialTeam } from "@/config/team";
 import type { CmsDocument } from "./schema";
 
 export function defaultCmsDocument(): CmsDocument {
@@ -20,14 +21,15 @@ export function defaultCmsDocument(): CmsDocument {
     ),
   }));
   return {
+    team: initialTeam.map((member) => ({ ...member })),
     settings: {
       whatsapp: business.contact.whatsapp,
       alternativePhone: business.contact.alternativePhone,
       tagline: business.tagline,
-      homeHeadline: "Your business deserves more than just",
-      homeEmphasis: "social media.",
+      homeHeadline: "A professional website for",
+      homeEmphasis: "your Nigerian business.",
       homeIntro:
-        "Get a professional website that helps customers discover your business, explore your products or services, and contact you with confidence.",
+        "Show what you offer, answer your customers’ questions and make it easy to enquire. We build around your business, with a written scope before work begins.",
       aboutIntro:
         "Growthly develops professional websites for Nigerian businesses, with design and marketing support available for separately agreed needs. Our focus is on making your offer clear and the next step easy.",
       contactIntro:
