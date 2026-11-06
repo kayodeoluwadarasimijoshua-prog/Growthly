@@ -29,6 +29,7 @@ describe("runtime published content without rebuilds or draft leakage", () => {
   it("preserves the current site while the CMS switch is off, without provider calls", async () => {
     expect((await getPublishedProjects()).map((p) => p.slug)).toEqual([
       "starxco",
+      "autovault-motors",
     ]);
     expect(mocks.single).not.toHaveBeenCalled();
   });
@@ -76,6 +77,16 @@ describe("runtime published content without rebuilds or draft leakage", () => {
     mocks.configured.mockReturnValue(false);
     expect((await getContentState()).available).toBe(false);
     await expect(getPublishedProjects()).rejects.toThrow();
+  });
+  it("does not inject the code-managed demo into an existing CMS publication", async () => {
+    vi.stubEnv("SITE_CMS_ENABLED", "true");
+    mocks.single.mockResolvedValue({
+      data: { published: defaultCmsDocument() },
+      error: null,
+    });
+    expect((await getPublishedProjects()).map((p) => p.slug)).toEqual([
+      "starxco",
+    ]);
   });
   it("refuses malformed or permission-invalid stored publications", async () => {
     vi.stubEnv("SITE_CMS_ENABLED", "true");

@@ -5,3 +5,5 @@
 The owner requested refining and adding this demonstration to Growthly. The screenshot shows the actual interface and its demonstration notice. Underlying vehicle artwork is AI-generated for that project, as recorded in its `public/images/CREDITS.md`; the screenshot is not evidence of a real vehicle, dealership, client or sales result.
 
 Upload the file through Growthly's owner editor to attach its private-media registration to the AutoVault project publication. Do not substitute a static path for a registered CMS image.
+
+The identical copy at `/images/projects/autovault-motors.webp` is used by the owner-approved code-managed portfolio entry. It is a public build asset, separate from the revocable CMS media route.

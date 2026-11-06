@@ -269,12 +269,12 @@ test("review screenshots", async ({ page }) => {
   });
 });
 
-test("only one StarXCO project remains and removed work returns 404", async ({
+test("StarXCO and the approved demo are separate and retired work returns 404", async ({
   page,
   request,
 }) => {
   await page.goto("/portfolio");
-  await expect(page.locator(".project-card")).toHaveCount(1);
+  await expect(page.locator(".project-card")).toHaveCount(2);
   await expect(
     page.getByRole("heading", { name: "StarXCO", exact: true }),
   ).toHaveCount(1);
@@ -328,8 +328,12 @@ test("one consistent sales action and supplied-logo rendition", async ({
       );
     }
     if (route === "/") {
-      await expect(page.locator(".hero-actions a.button--primary")).toHaveCount(1);
-      await expect(page.locator('.hero-actions a[href="#our-work"]')).toHaveText("See our work");
+      await expect(page.locator(".hero-actions a.button--primary")).toHaveCount(
+        1,
+      );
+      await expect(
+        page.locator('.hero-actions a[href="#our-work"]'),
+      ).toHaveText("See our work");
       await expect(page.locator(".closing-cta a")).toHaveCount(1);
       await expect(page.locator(".hero-project .project-card")).toHaveCount(1);
     }
@@ -622,12 +626,16 @@ test("project media uses only a registered local asset, otherwise intentional te
   });
   for (const path of ["/", "/portfolio", "/portfolio/starxco"]) {
     await page.goto(path);
+    const clientContent =
+      path === "/portfolio/starxco"
+        ? page.locator("main")
+        : page.locator(".project-card--client");
     if (projects[0].image) {
       const asset = projects[0].image;
       const response = await request.get(asset.src);
       expect(response.status()).toBe(200);
       expect(response.headers()["content-type"]).toContain("image/webp");
-      const image = page.locator(".project-front-image img");
+      const image = clientContent.locator(".project-front-image img");
       await expect(image).toHaveAttribute("alt", asset.alt);
       if (path === "/")
         await expect(page.locator(".hero-project img")).toHaveAttribute(
@@ -643,7 +651,7 @@ test("project media uses only a registered local asset, otherwise intentional te
         .toBe(true);
     } else {
       await expect(
-        page.locator(".project-front-image, .project-image-fallback"),
+        clientContent.locator(".project-front-image, .project-image-fallback"),
       ).toHaveCount(0);
       await expect(
         page.getByRole("link", { name: /Visit live website/ }),

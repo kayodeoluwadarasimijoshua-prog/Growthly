@@ -100,8 +100,11 @@ for (const state of ["loaded", "failed"] as const) {
     );
     for (const path of ["/", "/portfolio"]) {
       await page.goto(path);
+      const clientCard = page.locator(".project-card").filter({
+        has: page.getByRole("heading", { name: "StarXCO", exact: true }),
+      });
       if (projects[0].image) {
-        const link = page.locator(".project-card__visual");
+        const link = clientCard.locator(".project-card__visual");
         await expect(link).not.toHaveAttribute("aria-label", /.+/);
         await expect(link).toHaveAccessibleName(
           /StarXCO project details.*Client website/,
@@ -124,17 +127,17 @@ for (const state of ["loaded", "failed"] as const) {
             .toBe(true);
       } else {
         await expect(
-          page.locator(".project-card__visual, .project-image-fallback"),
+          clientCard.locator(".project-card__visual, .project-image-fallback"),
         ).toHaveCount(0);
         await expect(
-          page
-            .locator(".project-card")
-            .getByRole("link", { name: "View project details for StarXCO" }),
+          clientCard.getByRole("link", {
+            name: "View project details for StarXCO",
+          }),
         ).toBeVisible();
       }
-      await expect(
-        page.locator(path === "/" ? ".project-card h2" : ".project-card h3"),
-      ).toHaveText("StarXCO");
+      await expect(clientCard.locator(path === "/" ? "h2" : "h3")).toHaveText(
+        "StarXCO",
+      );
       const result = await new AxeBuilder({ page })
         .options({
           rules: { "label-content-name-mismatch": { enabled: true } },

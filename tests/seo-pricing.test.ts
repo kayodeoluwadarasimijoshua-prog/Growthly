@@ -95,5 +95,5 @@ it("lightweight client public identifiers stay aligned with the canonical real c
   expect([...publicProjectSlugs].sort()).toEqual(
     projects.map((p) => p.slug).sort(),
   );
-  expect(new Set(publicRoutePaths).size).toBe(19);
+  expect(new Set(publicRoutePaths).size).toBe(20);
 });

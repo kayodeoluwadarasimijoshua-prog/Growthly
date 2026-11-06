@@ -109,9 +109,10 @@ test("independent examples are explicit, safe links and never client cards", asy
     await expect(a).toHaveAttribute("target", "_blank");
     await expect(a).toHaveAttribute("rel", "noopener noreferrer");
   }
-  await expect(page.locator(".portfolio-layout .project-card h3")).toHaveText(
+  await expect(page.locator(".portfolio-layout .project-card h3")).toHaveText([
     "StarXCO",
-  );
+    "AutoVault Motors",
+  ]);
   expect(externalRequests).toEqual([]);
 });
 

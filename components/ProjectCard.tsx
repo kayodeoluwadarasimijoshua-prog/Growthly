@@ -14,7 +14,7 @@ export function ProjectCard({
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
     <article
-      className={`project-card project-card--client${project.image ? "" : " project-card--text-only"}`}
+      className={`project-card project-card--${project.kind === "demonstration" ? "demonstration" : "client"}${project.image ? "" : " project-card--text-only"}`}
     >
       {project.image && (
         <Link
@@ -56,7 +56,10 @@ export function ProjectCard({
               target="_blank"
               rel="noopener noreferrer"
             >
-              Visit live website <ArrowUpRight size={16} aria-hidden="true" />
+              {project.kind === "demonstration"
+                ? "Visit live demo"
+                : "Visit live website"}{" "}
+              <ArrowUpRight size={16} aria-hidden="true" />
               <span className="sr-only">
                 {" "}
                 for {project.name} (opens in a new tab)

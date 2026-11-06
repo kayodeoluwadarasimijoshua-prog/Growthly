@@ -69,7 +69,10 @@ export default async function CaseStudyPage({
               target="_blank"
               rel="noopener noreferrer"
             >
-              Visit live website <ArrowUpRight size={16} aria-hidden="true" />
+              {project.kind === "demonstration"
+                ? "Visit live demo"
+                : "Visit live website"}{" "}
+              <ArrowUpRight size={16} aria-hidden="true" />
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
           )}

@@ -3,9 +3,15 @@ import { isProjectImageReviewEnabled } from "@/lib/project-images";
 import { projects } from "@/config/content";
 import sitemap from "@/app/sitemap";
 describe("owner-approved public work", () => {
-  it("publishes exactly one StarXCO project", () => {
-    expect(projects.map((p) => p.slug)).toEqual(["starxco"]);
+  it("publishes StarXCO client work and the approved AutoVault demo separately", () => {
+    expect(projects.map((p) => p.slug)).toEqual([
+      "starxco",
+      "autovault-motors",
+    ]);
     expect(projects[0].liveUrl).toBe("https://starxco.com.ng/");
+    expect(projects[0].kind).toBe("client");
+    expect(projects[1].kind).toBe("demonstration");
+    expect(projects[1].featured).toBe(false);
   });
   it("does not enable an unapproved external image or pretend it is a screenshot", () => {
     if (projects[0].image) {
@@ -18,7 +24,7 @@ describe("owner-approved public work", () => {
         expect(isProjectImageReviewEnabled()).toBe(true);
     } else expect(projects[0].image).toBeUndefined();
   });
-  it("removes Daily Life Review and all demo routes from the sitemap", async () => {
+  it("keeps retired and unapproved work out of the sitemap", async () => {
     const paths = (await sitemap()).map((p) => p.url);
     for (const slug of [
       "daily-life-review",
@@ -28,11 +34,14 @@ describe("owner-approved public work", () => {
     ])
       expect(paths.some((path) => path.includes(slug))).toBe(false);
   });
-  it("includes only the approved project case study", async () => {
+  it("includes both approved project case studies", async () => {
     expect(
       (await sitemap())
         .filter((p) => p.url.includes("/portfolio/"))
         .map((p) => p.url),
-    ).toEqual(["https://growthly.com.ng/portfolio/starxco"]);
+    ).toEqual([
+      "https://growthly.com.ng/portfolio/starxco",
+      "https://growthly.com.ng/portfolio/autovault-motors",
+    ]);
   });
 });

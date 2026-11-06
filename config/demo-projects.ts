@@ -1,4 +1,5 @@
 import type { CmsProject } from "@/lib/cms/schema";
+import type { PortfolioProject } from "@/config/content";
 
 /** Owner-requested demo; adding the template never publishes or replaces content. */
 export function autoVaultDraft(id: string): CmsProject {
@@ -36,5 +37,37 @@ export function autoVaultDraft(id: string): CmsProject {
     published: false,
     publicationConfirmed: false,
     featured: false,
+  };
+}
+
+/** Owner-approved public case study for the code-managed portfolio. */
+export function autoVaultPortfolioProject(): PortfolioProject {
+  const draft = autoVaultDraft("autovault-motors");
+  return {
+    kind: "demonstration",
+    service: "website-development",
+    featured: false,
+    slug: draft.slug,
+    name: draft.name,
+    category: draft.category,
+    liveUrl: draft.liveUrl,
+    services: ["Website development"],
+    previewSummary: draft.summary,
+    summary: draft.summary,
+    overview: draft.overview,
+    creativeIntent: draft.creativeIntent,
+    scope: [...draft.scope],
+    designChoices: [...draft.designChoices],
+    note: "Self-initiated demonstration, not client work. Vehicles, prices and specifications are sample data; vehicle artwork is AI-generated. This is a real screenshot of the demo interface. No sales, traffic or conversion results are claimed. The hosted demo may change over time.",
+    image: {
+      src: "/images/projects/autovault-motors.webp",
+      width: 1440,
+      height: 900,
+      alt: "AutoVault Motors demo homepage with its sample-inventory notice, vehicle browsing action and illustrated saloon-car hero.",
+      credit:
+        "Growthly AutoVault Motors demo screenshot; underlying vehicle artwork is AI-generated.",
+      kind: "screenshot",
+      permissionConfirmed: true,
+    },
   };
 }

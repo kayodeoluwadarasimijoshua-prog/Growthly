@@ -1,4 +1,5 @@
 import projectImages from "@/config/project-images.json";
+import { autoVaultPortfolioProject } from "@/config/demo-projects";
 import {
   readProjectImage,
   isProjectImageReviewEnabled,
@@ -194,7 +195,7 @@ export type ClientProject = {
   note: string;
 };
 export type PortfolioProject = ClientProject;
-/** Only owner-approved published projects. Removed demos and Daily Life Review are not public work. */
+/** Owner-approved work. Self-initiated demos are explicitly separate from clients. */
 export const projects: PortfolioProject[] = [
   {
     kind: "client",
@@ -231,6 +232,7 @@ export const projects: PortfolioProject[] = [
     ],
     note: "The live website may change over time. No traffic, revenue or enquiry-growth results are claimed; the external form’s delivery was not tested for this portfolio update.",
   },
+  autoVaultPortfolioProject(),
 ];
 
 export const processSteps = [

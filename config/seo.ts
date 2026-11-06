@@ -46,7 +46,7 @@ export const seoPages = {
     path: "/portfolio",
     title: "Website Projects & Case Studies",
     description:
-      "Explore Growthly’s StarXCO client website, delivered scope and design decisions. See the work and discuss a website for your own business.",
+      "Explore Growthly’s StarXCO client website and AutoVault Motors dealership demo, with delivered scope, screenshots and design decisions.",
     primaryKeyword: "Growthly website projects",
     secondaryKeywords: [
       "business website case study",

@@ -9,7 +9,7 @@ export const publicServiceSlugs = [
   "ai-integration-automation",
   "digital-advertising",
 ] as const;
-export const publicProjectSlugs = ["starxco"] as const;
+export const publicProjectSlugs = ["starxco", "autovault-motors"] as const;
 export const publicRoutePaths = [
   "/",
   "/services",
