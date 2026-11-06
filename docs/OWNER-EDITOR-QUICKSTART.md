@@ -1,5 +1,7 @@
 # Growthly owner editor — team, text and images
 
+For the prepared AutoVault demonstration, see [AutoVault Portfolio](AUTOVAULT-PORTFOLIO.md). The Projects editor can add its case study as a private draft without replacing existing work.
+
 ## What is available
 
 The existing owner workspace at `/admin/content` now has a **Team** section alongside Projects, Contact & pricing, Page text, FAQs and History. The About page starts with the four names and responsibilities supplied by the owner. Photos are optional; initials are used until a permitted photo is published.

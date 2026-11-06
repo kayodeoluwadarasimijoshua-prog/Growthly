@@ -14,6 +14,34 @@ test.beforeEach(async ({ page }) => {
     page.getByRole("heading", { name: "Website content", exact: true }),
   ).toBeVisible();
 });
+test("AutoVault template adds a single private demo without changing StarXCO", async ({
+  page,
+}) => {
+  await page
+    .getByRole("button", { name: "Add AutoVault demo draft", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "AutoVault Motors", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Add AutoVault demo draft", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Draft saved");
+  const current = await state(page);
+  expect(current.published).toBeNull();
+  expect(current.draft.projects.map((p: { slug: string }) => p.slug)).toEqual([
+    "starxco",
+    "autovault-motors",
+  ]);
+  expect(current.draft.projects[1]).toMatchObject({
+    kind: "demonstration",
+    published: false,
+    publicationConfirmed: false,
+    featured: false,
+  });
+});
+
 test("team profiles save privately, require permissions and support role templates", async ({
   page,
 }) => {

@@ -7,6 +7,7 @@ import {
 } from "@/lib/cms/schema";
 import { servicePages } from "@/config/service-pages";
 import { TeamContentEditor } from "@/components/TeamContentEditor";
+import { autoVaultDraft } from "@/config/demo-projects";
 import {
   packagesFor,
   defaultPrices,
@@ -253,6 +254,16 @@ export function AdminContentManager({
     );
     setActive(id);
   }
+  function addAutoVault() {
+    if (
+      doc.projects.length >= 50 ||
+      doc.projects.some((p) => p.slug === "autovault-motors")
+    )
+      return;
+    const id = crypto.randomUUID();
+    change((d) => d.projects.push(autoVaultDraft(id)));
+    setActive(id);
+  }
   const faqs =
     faqGroup === "website-development"
       ? doc.settings.websiteFaqs
@@ -368,6 +379,28 @@ export function AdminContentManager({
                 >
                   Add project
                 </button>
+                <button
+                  type="button"
+                  className="button button--outline button--small"
+                  onClick={addAutoVault}
+                  disabled={
+                    doc.projects.length >= 50 ||
+                    doc.projects.some((p) => p.slug === "autovault-motors")
+                  }
+                >
+                  Add AutoVault demo draft
+                </button>
+                <p className="form-fineprint">
+                  Adds the prepared demo case study privately for your review.{" "}
+                  <a
+                    href="/images/demos/autovault-motors.webp"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open its screenshot (new tab)
+                  </a>{" "}
+                  to download and upload below.
+                </p>
                 <div className="cms-project-list">
                   {doc.projects.map((p) => (
                     <button
