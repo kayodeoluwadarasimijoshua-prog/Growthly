@@ -6,6 +6,7 @@ import {
   type CmsProject,
 } from "@/lib/cms/schema";
 import { servicePages } from "@/config/service-pages";
+import { TeamContentEditor } from "@/components/TeamContentEditor";
 import {
   packagesFor,
   defaultPrices,
@@ -172,10 +173,10 @@ export function AdminContentManager({
       setBusy(false);
     }
   }
-  async function upload(e: ChangeEvent<HTMLInputElement>) {
+  async function upload(e: ChangeEvent<HTMLInputElement>, memberId?: string) {
     const file = e.target.files?.[0];
     e.target.value = "";
-    if (!file || !project || pending.current) return;
+    if (!file || (!memberId && !project) || pending.current) return;
     if (
       file.size > 2_000_000 ||
       !["image/jpeg", "image/png", "image/webp"].includes(file.type)
@@ -183,7 +184,7 @@ export function AdminContentManager({
       setMessage("Choose a JPEG, PNG or WebP under 2 MB.");
       return;
     }
-    const id = project.id;
+    const id = memberId ?? project!.id;
     pending.current = true;
     setBusy(true);
     setMessage("");
@@ -205,7 +206,7 @@ export function AdminContentManager({
         return;
       }
       change((d) => {
-        const p = d.projects.find((p) => p.id === id);
+        const p = (memberId ? d.team : d.projects).find((p) => p.id === id);
         if (p)
           p.image = {
             assetId: result.assetId,
@@ -325,6 +326,7 @@ export function AdminContentManager({
         <nav className="cms-tabs" aria-label="Content sections">
           {[
             ["projects", "Projects"],
+            ["team", "Team"],
             ["business", "Contact & pricing"],
             ["copy", "Page text"],
             ["faq", "FAQs"],
@@ -740,6 +742,19 @@ export function AdminContentManager({
                 )}
               </div>
             </div>
+          )}
+          {tab === "team" && (
+            <TeamContentEditor
+              members={doc.team}
+              onChange={(team) =>
+                change((d) => {
+                  d.team = team;
+                })
+              }
+              onUpload={(event, id) => {
+                void upload(event, id);
+              }}
+            />
           )}
           {tab === "business" && (
             <>

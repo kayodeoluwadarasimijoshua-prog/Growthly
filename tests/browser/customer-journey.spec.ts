@@ -100,6 +100,7 @@ test("independent examples are explicit, safe links and never client cards", asy
       externalRequests.push(r.url());
   });
   await page.goto("/portfolio");
+  await page.locator(".portfolio-inspiration > summary").click();
   const examples = page.locator("#website-examples");
   await expect(examples).toContainText("Growthly did not build them");
   await expect(examples.locator(".example-card")).toHaveCount(3);
@@ -149,6 +150,8 @@ test("deeper buying information is visible and service scope remains native", as
     );
     await page.locator('.journey-nav a[href="#website-features"]').click();
     await expect(page).toHaveURL(/#website-features$/);
+    await page.locator("#website-features > summary").click();
+    await expect(page.locator("#website-features")).toHaveAttribute("open", "");
     for (const route of [
       "/website-development",
       "/business-websites",

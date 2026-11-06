@@ -49,6 +49,26 @@ beforeEach(() => {
   });
 });
 describe("revocable image access and private response headers", () => {
+  it("serves team photos only while their profile and image are currently approved", async () => {
+    const member = doc.team[0];
+    member.image = {
+      assetId: id,
+      width: 40,
+      height: 40,
+      alt: "Synthetic team photo",
+      credit: "Synthetic fixture",
+      permissionConfirmed: false,
+    };
+    expect((await getPublic()).status).toBe(404);
+    member.image.permissionConfirmed = true;
+    member.publicationConfirmed = false;
+    expect((await getPublic()).status).toBe(404);
+    member.publicationConfirmed = true;
+    expect((await getPublic()).status).toBe(200);
+    member.published = false;
+    expect((await getPublic()).status).toBe(404);
+    expect(mocks.download).toHaveBeenCalledOnce();
+  });
   it("does not expose draft, unpublished, unapproved or invalid asset references", async () => {
     expect((await getPublic("../invalid")).status).toBe(404);
     expect((await getPublic()).status).toBe(404);

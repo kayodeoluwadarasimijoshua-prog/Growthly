@@ -20,7 +20,10 @@ export async function GET(
   if (!state.available) return new Response(null, { status: 503, headers });
   if (
     !state.enabled ||
-    !state.document?.projects.some(
+    ![
+      ...(state.document?.projects ?? []),
+      ...(state.document?.team ?? []),
+    ].some(
       (p) =>
         p.published &&
         p.publicationConfirmed &&

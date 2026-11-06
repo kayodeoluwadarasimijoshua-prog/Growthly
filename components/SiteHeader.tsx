@@ -34,7 +34,7 @@ export function SiteHeader() {
     getServicePage(projectServices[pathname]);
   const quoteHref =
     pathname === "/request-a-quote"
-      ? "#main-content"
+      ? "#project-brief"
       : pathname === "/contact"
         ? "#contact-options"
         : servicePage

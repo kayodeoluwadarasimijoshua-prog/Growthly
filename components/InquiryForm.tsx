@@ -196,6 +196,8 @@ export function InquiryForm({
     );
   return (
     <form
+      id="project-brief"
+      tabIndex={-1}
       className="inquiry-form"
       aria-busy={status.kind === "loading"}
       method="post"
@@ -210,6 +212,29 @@ export function InquiryForm({
         }
       }}
     >
+      {/* Public guidance is safe before hydration; private-input controls stay hidden and disabled below. */}
+      <div className="form-intro">
+        <h2>
+          {isWebsite
+            ? "Tell us about your website."
+            : `Tell us about your ${sentenceServiceName(service.shortTitle)} project.`}
+        </h2>
+        <p>Requested service: {service.title}</p>
+        <p>
+          Required fields are marked *. Budget and{" "}
+          {isWebsite ? "launch" : "project"} date are preferences, not an
+          agreed price or deadline.
+        </p>
+      </div>
+      {!deliveryEnabled && (
+        <div className="delivery-note">
+          <strong>Send your brief through WhatsApp.</strong>
+          <p>
+            Online delivery is not enabled here. Review your prepared message
+            and press Send in WhatsApp. Nothing is sent until you do.
+          </p>
+        </div>
+      )}
       <div className="form-unavailable-note delivery-note" hidden={ready}>
         <h2>Contact us directly.</h2>
         <p>
@@ -248,30 +273,6 @@ export function InquiryForm({
           {isWebsite ? "Website" : service.shortTitle} quote details
         </legend>
         <input type="hidden" name="service" value={service.slug} />
-        <div className="form-intro">
-          <h2>
-            {isWebsite
-              ? "Tell us about your website."
-              : `Tell us about your ${sentenceServiceName(service.shortTitle)} project.`}
-          </h2>
-          <p>Requested service: {service.title}</p>
-          <p>
-            Required fields are marked *. Budget and{" "}
-            {isWebsite ? "launch" : "project"} date are preferences, not an
-            agreed price or deadline.
-          </p>
-        </div>
-        {!deliveryEnabled && (
-          <div className="delivery-note">
-            <strong>Send your brief through WhatsApp.</strong>
-            <p>
-              Online delivery is not enabled here. This form prepares a message
-              on your device; nothing is submitted to Growthly until you open
-              WhatsApp and press Send. You’ll need WhatsApp access. Prefer a
-              call? Use the contact options beside this form.
-            </p>
-          </div>
-        )}
         {status.kind === "error" && (
           <div className="form-status form-status--error" role="alert">
             {status.message}

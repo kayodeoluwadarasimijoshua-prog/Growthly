@@ -6,7 +6,7 @@ export async function HeroArtwork() {
   const project = await getFeaturedProject();
   if (!project)
     return (
-      <div className="hero-project service-focus-panel">
+      <div className="hero-project service-focus-panel" id="our-work">
         <h2>Build around your customers’ next step.</h2>
         <p>
           Explore website features, agreed scope and the process before
@@ -18,8 +18,20 @@ export async function HeroArtwork() {
       </div>
     );
   return (
-    <div className="hero-project">
+    <div className="hero-project" id="our-work">
+      <p className="eyebrow hero-proof-label">Published Growthly work</p>
       <ProjectCard project={project} priority />
+      <div className="hero-proof-scope">
+        <h3>Inside this project</h3>
+        <ul>
+          {project.scope.slice(0, 3).map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <p>
+          Explore the delivered scope and design decisions in the case study.
+        </p>
+      </div>
     </div>
   );
 }

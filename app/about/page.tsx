@@ -1,37 +1,19 @@
 import { getSiteSettings } from "@/lib/cms/public";
 import Link from "next/link";
 import { HandoverDecisions } from "@/components/WebsiteCapabilities";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ClosingCTA } from "@/components/ClosingCTA";
 import { PageIntro } from "@/components/PageIntro";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ProcessSteps } from "@/components/ProcessSteps";
-import { ProjectPreparation } from "@/components/CustomerJourney";
 import { pageMetadata } from "@/lib/seo";
 import { seoPages } from "@/config/seo";
+import { TeamSection } from "@/components/TeamSection";
 export const metadata = pageMetadata(
   seoPages.about.title,
   seoPages.about.description,
   "/about",
 );
-const principles = [
-  [
-    "Understand the business first",
-    "We start with your customers, your offer and the job your website needs to do. The design should support those needs, not distract from them.",
-  ],
-  [
-    "Make the scope visible",
-    "Pages, features, content responsibilities, review rounds, costs and timing belong in a written proposal—not assumptions.",
-  ],
-  [
-    "Use technology with a reason",
-    "A useful website does not need every tool on the market. We discuss integrations, accounts and ongoing costs before making them part of your project.",
-  ],
-  [
-    "Keep the relationship human",
-    "Useful feedback and clear approvals matter. You have a direct WhatsApp or phone route to discuss the work, not an automated sales maze.",
-  ],
-];
 export default async function AboutPage() {
   const settings = await getSiteSettings();
   return (
@@ -51,6 +33,7 @@ export default async function AboutPage() {
           </>
         }
       />
+      <TeamSection />
       <section className="section">
         <div className="container editorial-split">
           <div>
@@ -82,62 +65,6 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
-      <section className="section section--soft">
-        <div className="container">
-          <SectionHeading
-            eyebrow="How we approach the work"
-            title="Clear thinking. Considered design. Practical decisions."
-            description="The way we work should be as understandable as the website we create."
-          />
-          <div className="principles-grid">
-            {principles.map(([title, text], index) => (
-              <article key={title}>
-                <span className="editorial-number" aria-hidden="true">
-                  0{index + 1}
-                </span>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-      <section className="section">
-        <div className="container editorial-split">
-          <div>
-            <span className="eyebrow">Who we work with</span>
-            <h2>
-              Businesses with something useful to offer—and a clearer story to
-              tell.
-            </h2>
-          </div>
-          <div>
-            <p>
-              Our website solutions can suit entrepreneurs, service businesses,
-              retailers, schools, property businesses and growing teams. We
-              assess each project on its actual requirements rather than assume
-              every business needs the same pages or systems.
-            </p>
-            <ul className="check-list mt-24">
-              {[
-                "A first professional website beyond social media",
-                "Clearer services, products and enquiry routes",
-                "An online store or a more useful product catalogue",
-                "A focused redesign of an existing website",
-              ].map((item) => (
-                <li key={item}>
-                  <Check size={17} aria-hidden="true" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <Link className="text-link mt-24" href="/portfolio">
-              See our published work & website examples{" "}
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </section>
       <section className="section section--mint">
         <div className="container">
           <SectionHeading
@@ -146,11 +73,6 @@ export default async function AboutPage() {
             description="We discuss the brief, agree the plan, build and review, then launch after approval and the agreed payment milestones."
           />
           <ProcessSteps />
-        </div>
-      </section>
-      <section className="section">
-        <div className="container">
-          <ProjectPreparation />
         </div>
       </section>
       <section className="section section--soft">
@@ -186,7 +108,12 @@ export default async function AboutPage() {
       </section>
       <section className="section">
         <div className="container">
-          <HandoverDecisions />
+          <details className="home-feature-guide">
+            <summary>Accounts, ownership and support after launch</summary>
+            <div className="home-feature-guide__body">
+              <HandoverDecisions />
+            </div>
+          </details>
         </div>
       </section>
       <section className="section section--compact">

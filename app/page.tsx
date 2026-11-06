@@ -4,21 +4,11 @@ import { seoPages } from "@/config/seo";
 import { getSiteSettings } from "@/lib/cms/public";
 import { packagesFor, priceText } from "@/lib/cms/format";
 import { ServiceGateway } from "@/components/ServiceGateway";
-import { SupportingServiceSections } from "@/components/SupportingServiceSections";
 import { pageMetadata } from "@/lib/seo";
 import { StartProjectLink } from "@/components/ContactLinks";
 import { HeroArtwork } from "@/components/HeroArtwork";
-import {
-  Solutions,
-  WebsiteFAQ,
-  IndustriesList,
-  WhyGrowthly,
-} from "@/components/WebsiteSections";
-import {
-  WebsiteOutcomes,
-  WebsiteFitGuide,
-  ProjectSpotlight,
-} from "@/components/CustomerJourney";
+import { WebsiteFAQ } from "@/components/WebsiteSections";
+import { WebsiteFitGuide } from "@/components/CustomerJourney";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ProcessSteps } from "@/components/ProcessSteps";
 import { PackageGrid } from "@/components/PackageGrid";
@@ -33,6 +23,7 @@ export async function generateMetadata() {
     seoPages.home.path,
   );
 }
+
 export default async function HomePage() {
   const settings = await getSiteSettings();
   const websitePackages = packagesFor(settings);
@@ -75,30 +66,33 @@ export default async function HomePage() {
             </div>
             <div className="hero-actions">
               <StartProjectLink />
+              <a className="text-link" href="#our-work">
+                See our work <ArrowRight size={16} aria-hidden="true" />
+              </a>
             </div>
             <p className="hero-reassurance">
-              Tell us what you need. We agree the scope and price before you
-              commit.
+              Receive a written scope and quote before you commit.
             </p>
             <a
               className="text-link hero-other-services"
               href="#choose-your-service"
             >
-              Looking for design, video or promotion? Find your service{" "}
+              Need design, video or promotion? Find your service{" "}
               <ArrowRight size={16} aria-hidden="true" />
             </a>
           </div>
           <HeroArtwork />
         </div>
       </section>
-      <ServiceGateway />
+
+      <ServiceGateway compact />
+
       <nav className="journey-nav" aria-label="Explore website information">
         <div className="container">
           <span>Explore</span>
           {[
-            ["Website solutions", "website-solutions"],
-            ["Website features", "website-features"],
-            ["Why Growthly", "why-growthly"],
+            ["Website options", "website-solutions"],
+            ["Features & scope", "website-features"],
             ["Our work", "our-work"],
             ["Packages", "packages"],
             ["Our process", "our-process"],
@@ -110,116 +104,51 @@ export default async function HomePage() {
           ))}
         </div>
       </nav>
-      <section className="section" aria-labelledby="website-purpose-title">
+
+      <section
+        className="section"
+        id="website-solutions"
+        aria-label="Website options"
+      >
         <div className="container">
-          <div className="section-head">
-            <div className="section-head__copy">
-              <span className="eyebrow">More than an online address</span>
-              <h2 id="website-purpose-title">
-                Give interested customers a reason to take the next step.
-              </h2>
-              <p>
-                Social media starts conversations. Your website gives those
-                conversations a home: your offer, your information and a clear
-                way to reach you.
-              </p>
+          <WebsiteFitGuide />
+          <details className="home-feature-guide" id="website-features">
+            <summary>
+              Explore website features and what we agree in the scope
+            </summary>
+            <div className="home-feature-guide__body">
+              <WebsiteCapabilities preview />
             </div>
-            <p className="section-side-note">
-              Designed around what your customers need to know—not just what
-              looks good on a screen.
-            </p>
+          </details>
+          <div className="section-footer home-detail-links">
+            <Link className="text-link" href="/website-development">
+              Website development details{" "}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+            <Link className="text-link" href="/industries">
+              Ideas for your industry{" "}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
           </div>
-          <WebsiteOutcomes />
         </div>
       </section>
+
       <section
         className="section section--soft"
-        id="website-solutions"
-        aria-label="Website solutions"
-      >
-        <div className="container">
-          <SectionHeading
-            eyebrow="The right website for your business"
-            title="Different goals. A website that fits."
-            description="A service business, a shop and a school need different information. We plan the pages and features around your offer and the people you want to reach."
-          />
-          <Solutions />
-          <div className="section-footer">
-            <p>
-              Already have a website? We can review what is useful and plan a
-              focused redesign.
-            </p>
-            <Link className="text-link" href="/website-development">
-              Explore website development{" "}
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </section>
-      <section
-        className="section"
-        id="website-features"
-        aria-label="Website features and scope"
-      >
-        <div className="container">
-          <WebsiteCapabilities preview />
-        </div>
-      </section>
-      <section
-        className="section"
-        id="why-growthly"
-        aria-label="Why choose Growthly"
-      >
-        <div className="container">
-          <WhyGrowthly />
-          <div className="section-footer">
-            <p>
-              Website development is our primary focus. Communication and scope
-              stay clear from the first brief to handover.
-            </p>
-            <Link className="text-link" href="/about">
-              About Growthly & our approach{" "}
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </section>
-      <section
-        className="section section--mint"
-        id="our-work"
-        aria-label="Real website work"
-      >
-        <div className="container">
-          <ProjectSpotlight />
-        </div>
-      </section>
-      <section
-        className="section"
         id="packages"
         aria-label="Website packages and prices"
       >
         <div className="container">
-          <PackageGrid heading />
+          <PackageGrid heading compact />
           <div className="section-footer">
-            <p>
-              Starter, Business and E-commerce—all with an agreed scope and
-              first-year domain/hosting offer.
-            </p>
             <Link className="text-link" href="/pricing">
-              Compare packages & separate costs{" "}
+              Compare full inclusions, timing & separate costs{" "}
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
         </div>
       </section>
-      <section
-        className="section section--soft"
-        aria-label="Find a suitable website package"
-      >
-        <div className="container">
-          <WebsiteFitGuide />
-        </div>
-      </section>
+
       <section
         className="section"
         id="our-process"
@@ -227,55 +156,33 @@ export default async function HomePage() {
       >
         <div className="container">
           <SectionHeading
-            eyebrow="From first brief to launch"
-            title="A clear process. No guessing what comes next."
-            description="We agree the scope before we build, review the work with you and check the customer journey before launch. Timing depends on your content and requirements."
+            eyebrow="From your brief to launch"
+            title="Know the plan before the build begins."
+            description="We agree the work, review it with you and hand over the finished website. Timing depends on the scope, content and feedback."
           />
           <ProcessSteps />
-        </div>
-      </section>
-      <section
-        className="section section--soft"
-        aria-label="Websites for different businesses"
-      >
-        <div className="container">
-          <SectionHeading
-            eyebrow="Built around your customers"
-            title="Your business has its own story. Let’s make it easy to understand."
-            description="Practical website applications for retailers, schools, property businesses, professional services and more—not claims of specialist client experience."
-          />
-          <IndustriesList headingLevel={3} />
-          <div className="section-footer">
-            <p>
-              We choose features for your needs rather than add complexity you
-              will not use.
-            </p>
-            <Link className="text-link" href="/industries">
-              Website ideas for your industry{" "}
+          <div className="home-commitments" id="why-growthly">
+            <h3>What you can expect</h3>
+            <ul className="check-list">
+              {[
+                "Pages, features, payment milestones and revisions agreed in writing.",
+                "Domain ownership, renewal costs and support responsibilities explained before launch.",
+                "A mobile review, working contact routes and a handover for the agreed scope.",
+              ].map((item) => (
+                <li key={item}>
+                  <Check size={17} aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <Link className="text-link" href="/about">
+              About Growthly & our approach{" "}
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
         </div>
       </section>
-      <section
-        className="section supporting-section"
-        aria-label="Supporting creative and marketing services"
-      >
-        <div className="container">
-          <SectionHeading
-            eyebrow="Support beyond the website"
-            title="Bring your website, visuals and campaigns into the same conversation."
-            description="You can commission graphic design, AI video adverts, social media, ads and promotion, or scoped automation separately. Choose the relevant service below; you do not have to buy a website first."
-            action={
-              <Link className="text-link" href="/services">
-                All Growthly services{" "}
-                <ArrowRight size={16} aria-hidden="true" />
-              </Link>
-            }
-          />
-          <SupportingServiceSections />
-        </div>
-      </section>
+
       <section
         className="section section--soft"
         id="questions"
@@ -283,25 +190,29 @@ export default async function HomePage() {
       >
         <div className="container faq-layout">
           <SectionHeading
-            eyebrow="Before you invest"
-            title="Good questions. Straightforward answers."
-            description="Understand the cost, content, domain, process and ongoing responsibilities before choosing your website."
+            eyebrow="Before you get started"
+            title="Your first questions, answered."
+            description="Starting costs, timing and what your project needs. We confirm the details in your proposal."
             action={
-              <Link className="text-link" href="/contact">
-                Ask Growthly a question{" "}
+              <Link className="text-link" href="/website-development">
+                More website questions{" "}
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
             }
           />
-          <WebsiteFAQ />
+          <WebsiteFAQ limit={6} />
         </div>
       </section>
+
       <section
         className="section section--compact"
         aria-label="Request a website quote"
       >
         <div className="container">
-          <ClosingCTA />
+          <ClosingCTA
+            title="Tell us what your website needs to do."
+            description="Share your business and your goal. We’ll discuss a suitable website, the scope and your next step."
+          />
         </div>
       </section>
     </div>
