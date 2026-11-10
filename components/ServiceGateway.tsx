@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { Code2, Palette, Clapperboard } from "lucide-react";
 import { servicePages } from "@/config/service-pages";
 
 const summaries: Record<string, string> = {
@@ -10,7 +11,7 @@ const summaries: Record<string, string> = {
   "social-media-management":
     "Content planning, creative and agreed account support.",
   "digital-advertising":
-    "Campaign planning and setup; media spend scoped separately.",
+    "Facebook and Instagram ad planning, setup and creative; media spend is separate.",
   "ai-integration-automation":
     "Workflow discovery and appropriately scoped automation.",
 };
@@ -32,21 +33,25 @@ export function ServiceGateway({ compact = false }: { compact?: boolean }) {
             </h2>
           </div>
           <p>
-            Website development is our main focus. You can also commission the
-            other services independently—choose the offer that matches your
-            goal.
+            Websites, graphic design and AI adverts are our core services.
+            Choose one or combine them around a clear brief. Facebook and
+            Instagram advertising can be scoped separately.
           </p>
         </div>
         <div className="service-gateway__grid">
           {servicePages.map((page) => (
             <Link
-              className={`service-gateway__card${page.slug === "website-development" ? " service-gateway__card--primary" : ""}`}
+              className={`service-gateway__card${["website-development", "graphic-design", "ai-video-adverts"].includes(page.slug) ? " service-gateway__card--primary" : ""}`}
               href={page.path}
               key={page.slug}
             >
               <div className="service-gateway__card-top">
-                {page.slug === "website-development" ? (
-                  <span className="service-gateway__focus">Our main focus</span>
+                {[
+                  "website-development",
+                  "graphic-design",
+                  "ai-video-adverts",
+                ].includes(page.slug) ? (
+                  <span className="service-gateway__focus">Core service</span>
                 ) : (
                   <span className="service-gateway__focus">
                     Standalone service
@@ -54,6 +59,25 @@ export function ServiceGateway({ compact = false }: { compact?: boolean }) {
                 )}
                 <ArrowUpRight size={18} aria-hidden="true" />
               </div>
+              {page.slug === "website-development" ? (
+                <Code2
+                  className="studio-service-icon"
+                  size={26}
+                  aria-hidden="true"
+                />
+              ) : page.slug === "graphic-design" ? (
+                <Palette
+                  className="studio-service-icon"
+                  size={26}
+                  aria-hidden="true"
+                />
+              ) : page.slug === "ai-video-adverts" ? (
+                <Clapperboard
+                  className="studio-service-icon"
+                  size={26}
+                  aria-hidden="true"
+                />
+              ) : null}
               <h3>{page.label}</h3>
               <p>{summaries[page.slug]}</p>
               <span className="service-gateway__destination">

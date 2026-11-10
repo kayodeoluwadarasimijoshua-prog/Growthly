@@ -7,6 +7,7 @@ import {
   type PointerEvent,
   type KeyboardEvent,
 } from "react";
+import { getPortfolioService } from "@/config/portfolio-services";
 import { usePathname } from "next/navigation";
 import { usePublicSettings } from "@/components/PublicSiteSettings";
 import { getWhatsAppUrl } from "@/lib/site";
@@ -65,7 +66,12 @@ export function FloatingWhatsApp({
   const servicePage =
     contextualService ??
     getServicePageForPath(pathname) ??
-    getServicePage(projectServices[pathname]);
+    getServicePage(projectServices[pathname]) ??
+    getServicePage(
+      pathname.startsWith("/portfolio/services/")
+        ? getPortfolioService(pathname.split("/").at(-1) ?? "")?.slug
+        : undefined,
+    );
   const contactMessage =
     servicePage || ["/contact", "/request-a-quote"].includes(pathname)
       ? serviceContactMessage(servicePage)
@@ -80,6 +86,7 @@ export function FloatingWhatsApp({
   const hidden =
     !available ||
     pathname.startsWith("/admin") ||
+    pathname.startsWith("/creative") ||
     (!pageScoped && ["/contact", "/request-a-quote"].includes(pathname));
 
   function move(next: ContactPosition) {

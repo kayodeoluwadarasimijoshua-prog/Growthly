@@ -402,3 +402,22 @@ test("reorders and removes draft projects without publishing the change", async 
   ]);
   expect(s.published).toBeNull();
 });
+
+
+test("studio introduction changes only the reviewed draft copy", async ({ page }) => {
+  const original = await state(page);
+  await page.getByRole("button", { name: "Page text", exact: true }).click();
+  await page.getByLabel("Home introduction", { exact: true }).fill("Synthetic older website introduction kept until the owner reviews an update.");
+  await page.getByRole("button", { name: "Use studio introduction", exact: true }).click();
+  await expect(page.getByLabel("Home introduction", { exact: true })).toHaveValue(/graphic design and AI-assisted adverts/);
+  expect((await state(page)).draft).toEqual(original.draft);
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Draft saved");
+  const saved = await state(page);
+  expect(saved.published).toBeNull();
+  expect(saved.draft.projects).toEqual(original.draft.projects);
+  for (const key of ["whatsapp", "alternativePhone", "tagline", "contactIntro"]) {
+    expect(saved.draft.settings[key]).toEqual(original.draft.settings[key]);
+  }
+  expect(saved.draft.settings.prices).toEqual(original.draft.settings.prices);
+});

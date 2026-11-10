@@ -75,6 +75,8 @@ test("mobile project screenshot selects a smaller private responsive source", as
       .toBe(true);
     expect(
       await image.evaluate((el: HTMLImageElement) => el.currentSrc),
-    ).toMatch(/review-media\/starxco-480\.webp$/);
+    ).toMatch(
+      /review-media\/starxco-480\.webp$|\/_next\/image\?url=%2Fimages%2Fprojects%2Fautovault-motors\.webp/,
+    );
   }
 });

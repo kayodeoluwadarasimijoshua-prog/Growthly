@@ -61,15 +61,28 @@ export async function WorkPreview() {
 export async function WebsiteFAQ({
   compact = false,
   limit,
+  includeStudio = false,
 }: {
   compact?: boolean;
   limit?: number;
+  includeStudio?: boolean;
 }) {
   const settings = await getSiteSettings();
   const websiteFAQs = settings.websiteFaqs.map((f) => [
     f.question,
     expandPriceTokens(f.answer, settings),
   ]);
+  const studioFAQs = includeStudio
+    ? ["graphic-design", "ai-video-adverts"].flatMap(
+        (service) =>
+          settings.serviceFaqs[service]
+            ?.slice(0, 1)
+            .map((faq) => [
+              faq.question,
+              expandPriceTokens(faq.answer, settings),
+            ]) ?? [],
+      )
+    : [];
   const visible = compact
     ? websiteFAQs.filter(([q]) =>
         [
@@ -81,7 +94,7 @@ export async function WebsiteFAQ({
     : websiteFAQs;
   return (
     <div className="faq-list">
-      {visible.slice(0, limit).map(([q, a]) => (
+      {[...studioFAQs, ...visible].slice(0, limit).map(([q, a]) => (
         <details className="faq-item" key={q}>
           <summary>{q}</summary>
           <p>{a}</p>

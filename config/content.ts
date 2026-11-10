@@ -240,7 +240,7 @@ export const processSteps = [
     number: "01",
     name: "Tell us about your business",
     description:
-      "Share your customers, offer and the job your website needs to do.",
+      "Share your customers, your offer and what you want your project to do.",
   },
   {
     number: "02",
@@ -252,13 +252,13 @@ export const processSteps = [
     number: "03",
     name: "Design, build & test",
     description:
-      "We create the agreed pages, review them together and check the enquiry journey.",
+      "We create the agreed website, design or advert, review it with you and refine the work against the brief.",
   },
   {
     number: "04",
     name: "Approve & launch",
     description:
-      "After approval and agreed payment milestones, we launch and hand over the website.",
+      "After approval and agreed payment milestones, we deliver the finished work and complete the agreed handover.",
   },
 ] as const;
 

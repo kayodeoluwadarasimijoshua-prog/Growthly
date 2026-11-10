@@ -6,6 +6,9 @@ import {
   type CmsProject,
 } from "@/lib/cms/schema";
 import { servicePages } from "@/config/service-pages";
+import { studioIntroductions } from "@/config/studio-copy";
+import { CreativeInbox } from "@/components/CreativeInbox";
+import { WritingAssistant } from "@/components/WritingAssistant";
 import { TeamContentEditor } from "@/components/TeamContentEditor";
 import { autoVaultDraft } from "@/config/demo-projects";
 import {
@@ -337,6 +340,7 @@ export function AdminContentManager({
         <nav className="cms-tabs" aria-label="Content sections">
           {[
             ["projects", "Projects"],
+            ["creative", "Creative submissions"],
             ["team", "Team"],
             ["business", "Contact & pricing"],
             ["copy", "Page text"],
@@ -368,6 +372,34 @@ export function AdminContentManager({
         )}
         <fieldset disabled={busy}>
           <legend className="sr-only">Editable website content</legend>
+          {tab === "creative" && (
+            <CreativeInbox
+              onImport={(project) => {
+                if (doc.projects.length >= 50) {
+                  setMessage("The project limit has been reached.");
+                  return;
+                }
+                if (
+                  doc.projects.some(
+                    (existing) =>
+                      existing.id === project.id ||
+                      existing.slug === project.slug,
+                  )
+                ) {
+                  setMessage(
+                    "This project is already in your CMS draft. Review it in Projects; no existing work was overwritten.",
+                  );
+                  return;
+                }
+                change((draft) => draft.projects.push(project));
+                setActive(project.id);
+                setTab("projects");
+                setMessage(
+                  "Creative submission copied into your unsaved draft. Review its details and permissions before publishing.",
+                );
+              }}
+            />
+          )}
           {tab === "projects" && (
             <div className="cms-project-layout">
               <aside aria-label="Project list">
@@ -534,6 +566,11 @@ export function AdminContentManager({
                       value={project.overview}
                       onChange={(overview) => projectChange({ overview })}
                       multiline
+                    />
+                    <WritingAssistant
+                      service={project.service}
+                      source={project.overview}
+                      onApply={(overview) => projectChange({ overview })}
                     />
                     <Field
                       label="Purpose / creative intent"
@@ -867,6 +904,24 @@ export function AdminContentManager({
           {tab === "copy" && (
             <>
               <h2>Key page text</h2>
+              <div className="delivery-note">
+                <strong>The redesigned studio introduction</strong>
+                <p>
+                  Use the new website, graphic-design and AI-advert introduction
+                  without changing your contacts, prices or projects. This only
+                  changes your unsaved draft.
+                </p>
+                <button
+                  type="button"
+                  className="button button--outline button--small"
+                  onClick={() => {
+                    change((draft) => Object.assign(draft.settings, studioIntroductions));
+                    setMessage("Studio introduction applied to your unsaved draft. Review before publishing.");
+                  }}
+                >
+                  Use studio introduction
+                </button>
+              </div>
               {(
                 [
                   "homeHeadline",

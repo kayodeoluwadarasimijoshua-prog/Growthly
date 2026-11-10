@@ -322,10 +322,13 @@ test("one consistent sales action and supplied-logo rendition", async ({
     await page.goto(route);
     const buttons = await page.locator("a.button:visible").all();
     for (const button of buttons) {
-      await expect(button).toContainText("Get a Website Quote");
-      expect(await button.getAttribute("href")).toMatch(
-        /^\/request-a-quote(?:\?|$)/,
-      );
+      const href = await button.getAttribute("href");
+      if (href === "/services")
+        await expect(button).toHaveText(/Start Your Project|Find your service/);
+      else {
+        await expect(button).toContainText("Get a Website Quote");
+        expect(href).toMatch(/^\/request-a-quote(?:\?|$)/);
+      }
     }
     if (route === "/") {
       await expect(page.locator(".hero-actions a.button--primary")).toHaveCount(
@@ -335,7 +338,7 @@ test("one consistent sales action and supplied-logo rendition", async ({
         page.locator('.hero-actions a[href="#our-work"]'),
       ).toHaveText("See our work");
       await expect(page.locator(".closing-cta a")).toHaveCount(1);
-      await expect(page.locator(".hero-project .project-card")).toHaveCount(1);
+      await expect(page.locator(".studio-work .project-card")).toHaveCount(2);
     }
   }
   await expect(page.locator("header .brand-mark")).toHaveAttribute(
@@ -552,8 +555,10 @@ test("focused homepage keeps useful decisions, real work and accessible detail",
       await expect(page.locator(`.journey-nav a[href="#${id}"]`)).toBeVisible();
     }
     await expect(page.locator(".fit-choice")).toHaveCount(3);
-    await expect(page.locator(".project-card")).toHaveCount(1);
-    await expect(page.locator(".hero-project h2")).toHaveText("StarXCO");
+    await expect(page.locator(".project-card")).toHaveCount(2);
+    await expect(
+      page.locator(".studio-work .project-card--client h3"),
+    ).toHaveText("StarXCO");
     await expect(page.locator("#our-process .process-step")).toHaveCount(4);
     await expect(page.locator("#questions .faq-item")).toHaveCount(6);
     await expect(page.locator("#why-growthly")).toContainText(
@@ -573,13 +578,14 @@ test("focused homepage keeps useful decisions, real work and accessible detail",
       "Kora Botanics",
       "Abeni Stay",
       "Ayo Studio",
-      "Self-initiated",
-      "Demonstration work",
     ])
       expect(text).not.toContain(name);
-    const tips = (await page.locator(".hero-assurances").boundingBox())!;
-    const action = (await page.locator(".hero-actions").boundingBox())!;
-    expect(action.y - (tips.y + tips.height)).toBeGreaterThanOrEqual(24);
+    await expect(page.locator(".studio-offer-tags")).toContainText(
+      "Graphic design",
+    );
+    await expect(page.locator(".studio-offer-tags")).toContainText(
+      "AI adverts",
+    );
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -676,14 +682,16 @@ test("external image-host failure cannot break the project or its live link", as
   await page.goto("/");
   await expect(
     page
-      .locator(".hero-project")
+      .locator(".studio-work .project-card--client")
       .getByRole("link", { name: /Visit live website/ }),
   ).toHaveAttribute("href", "https://starxco.com.ng/");
   if (!projects[0].image) {
-    await expect(page.locator(".hero-project img")).toHaveCount(0);
+    await expect(
+      page.locator(".studio-work .project-card--client img"),
+    ).toHaveCount(0);
     await expect(page.locator(".project-image-fallback")).toHaveCount(0);
     await expect(
-      page.locator(".hero-project .project-card--text-only"),
+      page.locator(".studio-work .project-card--text-only"),
     ).toBeVisible();
   }
   expect(external).toEqual([]);

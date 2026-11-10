@@ -64,8 +64,10 @@ test("StarXCO remains the genuine client project featured on Home", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(page.locator(".hero-project h2")).toHaveText("StarXCO");
   await expect(
-    page.locator(".hero-project .project-card--demonstration"),
+    page.locator(".studio-work .project-card--client h3"),
+  ).toHaveText("StarXCO");
+  await expect(
+    page.locator(".studio-work .project-card--client .capability-label"),
   ).toHaveCount(0);
 });

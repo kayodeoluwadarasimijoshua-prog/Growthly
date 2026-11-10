@@ -3,7 +3,7 @@ export const business = {
   tagline: "Helping Businesses Scale Up.",
   primaryCTA: { label: "Get a Website Quote", href: "/request-a-quote" },
   description:
-    "Professional website development for Nigerian businesses. Clear design, practical enquiry paths and a stronger online presence.",
+    "Websites, graphic design and AI-assisted adverts for Nigerian businesses. Clear presentation, practical enquiry paths and a written project scope.",
   contact: {
     whatsapp: "08129391626",
     alternativePhone: "09162994183",

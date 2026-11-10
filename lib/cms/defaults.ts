@@ -3,6 +3,7 @@ import { projects } from "@/config/content";
 import { websiteFAQs } from "@/config/websites";
 import { serviceMarketing } from "@/config/service-marketing";
 import { servicePages } from "@/config/service-pages";
+import { studioIntroductions } from "@/config/studio-copy";
 import { initialTeam } from "@/config/team";
 import type { CmsDocument } from "./schema";
 
@@ -26,12 +27,7 @@ export function defaultCmsDocument(): CmsDocument {
       whatsapp: business.contact.whatsapp,
       alternativePhone: business.contact.alternativePhone,
       tagline: business.tagline,
-      homeHeadline: "A professional website for",
-      homeEmphasis: "your Nigerian business.",
-      homeIntro:
-        "Show what you offer, answer your customers’ questions and make it easy to enquire. We build around your business, with a written scope before work begins.",
-      aboutIntro:
-        "Growthly develops professional websites for Nigerian businesses, with design and marketing support available for separately agreed needs. Our focus is on making your offer clear and the next step easy.",
+      ...studioIntroductions,
       contactIntro:
         "Ask a question about {{service}}, share your goal and discuss the next step. Scope, cost and timing are agreed before you commit.",
       prices: { starter: 100000, business: 200000, ecommerce: 300000 },

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { usePublicSettings } from "@/components/PublicSiteSettings";
-import { business } from "@/config/business";
+import { getPortfolioService } from "@/config/portfolio-services";
 import {
   getServicePageForPath,
   getServicePage,
@@ -29,9 +29,21 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const { projectServices } = usePublicSettings();
+  const galleryService = pathname.startsWith("/portfolio/services/")
+    ? getPortfolioService(pathname.split("/").at(-1) ?? "")
+    : undefined;
   const servicePage =
     getServicePageForPath(pathname) ??
-    getServicePage(projectServices[pathname]);
+    getServicePage(projectServices[pathname]) ??
+    getServicePage(galleryService?.slug) ??
+    ([
+      "/pricing",
+      "/business-websites",
+      "/ecommerce-websites",
+      "/industries",
+    ].includes(pathname)
+      ? getServicePage("website-development")
+      : undefined);
   const quoteHref =
     pathname === "/request-a-quote"
       ? "#project-brief"
@@ -39,18 +51,19 @@ export function SiteHeader() {
         ? "#contact-options"
         : servicePage
           ? getServiceQuoteHref(servicePage.slug)
-          : business.primaryCTA.href;
+          : "/services";
   const quoteLabel =
     pathname === "/request-a-quote"
       ? "Complete your brief"
       : pathname === "/contact"
         ? "Contact options"
-        : (servicePage?.cta ?? business.primaryCTA.label);
+        : (servicePage?.cta ?? "Start Your Project");
 
   function isCurrent(href: string) {
     if (href === "/") return pathname === "/";
     if (
       href === "/services" &&
+      !pathname.startsWith("/portfolio") &&
       servicePage?.slug !== "website-development" &&
       servicePage
     )

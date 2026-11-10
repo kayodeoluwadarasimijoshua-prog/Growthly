@@ -16,7 +16,7 @@ beforeEach(() => {
   mocks.create.mockResolvedValue({ auth: { getUser: mocks.getUser } });
 });
 describe("VA planning must not widen existing administrator access", () => {
-  for (const role of ["assistant", "support", "customer", undefined])
+  for (const role of ["assistant", "support", "customer", "creative_editor", undefined])
     it(`does not grant ${role ?? "unassigned"} users full lead access`, async () => {
       mocks.getUser.mockResolvedValue({
         data: {

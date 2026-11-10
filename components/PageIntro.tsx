@@ -51,7 +51,7 @@ export function PageIntro({
   children?: ReactNode;
 }) {
   return (
-    <section className="page-hero page-hero--green">
+    <section className="page-hero page-hero--green page-intro">
       <div className="container">
         <BreadcrumbTrail items={[{ name: label, path }]} />
         <div className={aside ? "page-hero__grid" : "page-intro__copy"}>

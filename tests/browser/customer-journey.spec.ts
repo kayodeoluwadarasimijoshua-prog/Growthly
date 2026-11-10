@@ -6,6 +6,11 @@ for (const choice of websiteFitChoices) {
     page,
   }) => {
     await page.goto("/");
+    await page
+      .getByText("Planning a website? Compare the right starting points.", {
+        exact: true,
+      })
+      .click();
     const detail = page.locator(".fit-choice").filter({ hasText: choice.goal });
     const summary = detail.locator("summary");
     await summary.focus();
@@ -35,9 +40,16 @@ test("native package guide and primary navigation work without scripts", async (
     const page = await context.newPage();
     await page.goto("/");
     await expect(
-      page.locator('#primary-navigation a[href="/services"]'),
+      page
+        .getByRole("navigation", { name: "Main navigation", exact: true })
+        .getByRole("link", { name: "Services", exact: true }),
     ).toBeVisible();
     await expect(page.locator(".menu-toggle")).not.toBeVisible();
+    await page
+      .getByText("Planning a website? Compare the right starting points.", {
+        exact: true,
+      })
+      .click();
     await page.locator(".fit-choice summary").first().click();
     await expect(page.locator(".fit-choice").first()).toHaveAttribute(
       "open",
@@ -68,7 +80,9 @@ test("tablet and desktop navigation reflow, escape and service destination", asy
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const toggle = page.locator(".menu-toggle");
-    const service = page.locator('#primary-navigation a[href="/services"]');
+    const service = page
+      .getByRole("navigation", { name: "Main navigation", exact: true })
+      .getByRole("link", { name: "Services", exact: true });
     if (width <= 1160) {
       await expect(toggle).toBeVisible();
       await toggle.click();
@@ -149,8 +163,8 @@ test("deeper buying information is visible and service scope remains native", as
     await expect(page.locator("#website-features .capability-row")).toHaveCount(
       4,
     );
-    await page.locator('.journey-nav a[href="#website-features"]').click();
-    await expect(page).toHaveURL(/#website-features$/);
+    await page.locator('.journey-nav a[href="#website-solutions"]').click();
+    await expect(page).toHaveURL(/#website-solutions$/);
     await page.locator("#website-features > summary").click();
     await expect(page.locator("#website-features")).toHaveAttribute("open", "");
     for (const route of [

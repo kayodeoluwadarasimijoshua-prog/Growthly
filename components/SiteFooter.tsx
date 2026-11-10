@@ -18,8 +18,8 @@ export async function SiteFooter() {
           <div className="footer-brand">
             <Brand footer />
             <p>
-              {settings.tagline} Professional websites and practical digital
-              support for Nigerian businesses.
+              {settings.tagline} Websites, graphic design and AI adverts
+              for Nigerian businesses.
             </p>
           </div>
           <div className="footer-columns">

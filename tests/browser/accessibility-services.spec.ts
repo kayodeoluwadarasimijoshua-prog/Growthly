@@ -135,9 +135,9 @@ for (const state of ["loaded", "failed"] as const) {
           }),
         ).toBeVisible();
       }
-      await expect(clientCard.locator(path === "/" ? "h2" : "h3")).toHaveText(
-        "StarXCO",
-      );
+      await expect(
+        clientCard.getByRole("heading", { name: "StarXCO", exact: true }),
+      ).toHaveText("StarXCO");
       const result = await new AxeBuilder({ page })
         .options({
           rules: { "label-content-name-mismatch": { enabled: true } },
@@ -167,12 +167,12 @@ test("dark service hero links retain contrast, keyboard focus and contact landma
         await expect(link).toBeFocused();
       }
       expect(await link.evaluate((el) => getComputedStyle(el).color)).toBe(
-        "rgb(221, 245, 233)",
+        "rgb(224, 242, 233)",
       );
       if (state === "focus") {
         expect(
           await link.evaluate((el) => getComputedStyle(el).outlineColor),
-        ).toBe("rgb(221, 245, 233)");
+        ).toBe("rgb(224, 242, 233)");
         expect(
           await link.evaluate((el) => getComputedStyle(el).outlineStyle),
         ).not.toBe("none");

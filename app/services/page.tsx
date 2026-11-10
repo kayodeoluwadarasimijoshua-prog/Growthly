@@ -24,8 +24,8 @@ export default async function ServicesPage() {
       <PageIntro
         label="Services"
         path="/services"
-        eyebrow="Website development comes first"
-        title="Website development is our focus. It’s not our only service."
+        eyebrow="Websites · Graphic design · AI adverts"
+        title="Make your business clear, recognizable and easy to contact."
         description="Choose the service your business needs: website development, graphic design, AI video adverts, social media, ads and promotion, or scoped automation. Each has its own page, brief and written scope."
         aside={
           <>
@@ -122,8 +122,8 @@ export default async function ServicesPage() {
       <section className="section">
         <div className="container">
           <SectionHeading
-            eyebrow="Separately scoped supporting services"
-            title="Complement the website when it makes sense."
+            eyebrow="Creative work & promotion"
+            title="Give your message the right form."
             description="Keep your business presentation consistent across the touchpoints you choose. These services are not included automatically in a website package."
           />
           <SupportingServiceSections />
@@ -163,8 +163,9 @@ export default async function ServicesPage() {
       <section className="section section--compact">
         <div className="container">
           <ClosingCTA
+            chooseService
             title="Let’s choose the right next step for your business."
-            description="Share your goals and requirements. We’ll discuss the website first, then any supporting work that has a clear purpose."
+            description="Share your goals and requirements. We’ll discuss the services that fit your goal, with each deliverable and cost agreed in writing."
           />
         </div>
       </section>

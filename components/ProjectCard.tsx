@@ -43,6 +43,16 @@ export function ProjectCard({
         )}
         <Heading>{project.name}</Heading>
         <p>{project.summary}</p>
+        {!project.image && project.scope.length > 0 && (
+          <div className="project-card__scope">
+            <strong>Inside the project</strong>
+            <ul>
+              {project.scope.slice(0, 3).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="project-card__links">
           <Link className="text-link" href={`/portfolio/${project.slug}`}>
             View project details{" "}

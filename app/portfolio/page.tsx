@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { getPublishedProjects } from "@/lib/cms/public";
 import { seoPages } from "@/config/seo";
 import { pageMetadata } from "@/lib/seo";
+import { PortfolioNavigation } from "@/components/PortfolioNavigation";
 import { ProjectCard } from "@/components/ProjectCard";
 import { ClosingCTA } from "@/components/ClosingCTA";
 import { PageIntro } from "@/components/PageIntro";
@@ -38,6 +39,7 @@ export default async function PortfolioPage() {
             title="Explore the work and the thinking behind it."
             description="Each project identifies the service provided, purpose and actual work. Client work and self-initiated demonstrations are labelled separately, without unmeasured traffic, conversion or sales claims."
           />
+          <PortfolioNavigation />
           <div className="portfolio-layout">
             {projects.length === 0 && (
               <p>
@@ -89,6 +91,7 @@ export default async function PortfolioPage() {
       <section className="section section--compact">
         <div className="container">
           <ClosingCTA
+            chooseService
             title="Your business deserves its own considered website."
             description="Tell us what you offer and which ideas matter to you. We’ll discuss a suitable design direction and a realistic scope."
           />

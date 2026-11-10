@@ -1,3 +1,4 @@
+import { validMediaPath } from "@/lib/cms/media";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { getAdminContext } from "@/lib/supabase/admin";
@@ -187,7 +188,7 @@ export async function POST(request: NextRequest) {
                 m.id === image.assetId &&
                 m.width === image.width &&
                 m.height === image.height &&
-                m.storage_path === `${image.assetId}.webp`,
+                validMediaPath(m.storage_path, image.assetId),
             )
           )
             issues.push(

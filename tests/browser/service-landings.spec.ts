@@ -149,7 +149,7 @@ test("home links to every service and the overview retains each full service sco
   }
   await page.goto("/");
   await expect(page.locator(".hero-actions .button")).toHaveText(
-    "Get a Website Quote",
+    "Find your service",
   );
 });
 
@@ -186,7 +186,7 @@ test("full overview sections remain reachable with native anchors and no scripts
   }
 });
 
-test("early service chooser keeps website priority and exposes all ad destinations", async ({
+test("early service chooser gives the three core services priority and exposes support services", async ({
   page,
 }) => {
   for (const width of [320, 390, 768, 1440]) {
@@ -194,9 +194,8 @@ test("early service chooser keeps website priority and exposes all ad destinatio
     for (const path of ["/", "/services"]) {
       await page.goto(path);
       await expect(page.locator(".service-gateway__card")).toHaveCount(6);
-      await expect(
-        page.locator(".service-gateway__card--primary"),
-      ).toHaveAttribute("href", "/website-development");
+      await expect(page.locator(".service-gateway__card--primary")).toHaveCount(3);
+      for (const path of ["/website-development", "/graphic-design", "/aiads"]) await expect(page.locator(`.service-gateway__card--primary[href="${path}"]`)).toBeVisible();
       for (const service of servicePages)
         await expect(
           page.locator(`.service-gateway__card[href="${service.path}"]`),
@@ -210,10 +209,11 @@ test("early service chooser keeps website priority and exposes all ad destinatio
     await page.goto("/");
     const ordering = await page
       .locator(".home-sales-page > section")
-      .evaluateAll((es) => es.slice(0, 2).map((e) => e.className));
+      .evaluateAll((es) => es.slice(0, 3).map((e) => e.className));
     expect(ordering[0]).toContain("website-hero");
-    expect(ordering[1]).toContain("service-gateway");
-    await page.locator(".hero-other-services").click();
+    expect(ordering[1]).toContain("studio-work");
+    expect(ordering[2]).toContain("service-gateway");
+    await page.locator('.journey-nav a[href="#choose-your-service"]').click();
     await expect(page.locator("#choose-your-service")).toBeInViewport();
     await page.locator('.service-gateway__card[href="/aiads"]').click();
     await expect(page).toHaveURL(/\/aiads$/);

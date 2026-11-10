@@ -168,6 +168,12 @@ export default async function PrivacyPage() {
               </p>
             </section>
             <section>
+              <h2>Website guide and optional AI assistance</h2>
+              <p>The website guide can show answers from published website information without contacting an AI provider. If the Ask AI option is enabled and you submit a question, that question and relevant approved website facts are sent to our configured AI provider to generate a response. Do not include private account, payment or customer information. You can use the normal contact links instead.</p>
+              <p>This application does not save a chat history. The hosting and AI providers may process request information under their own terms and retention policies. AI answers can be mistaken; confirm prices, project scope and important details directly with Growthly.</p>
+              <p>Invited creative editors can save private graphic-design and AI-advert drafts for owner review. They do not receive access to customer enquiry records or owner settings. Optional AI writing suggestions send only the notes deliberately submitted by the editor; they never publish content automatically.</p>
+            </section>
+            <section>
               <h2>Retention and your choices</h2>
               <p>
                 Enquiry records are not deleted automatically. Contact GROWTHLY

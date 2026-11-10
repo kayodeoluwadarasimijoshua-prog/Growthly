@@ -4,14 +4,32 @@ import { defaultCmsDocument } from "@/lib/cms/defaults";
 import type { Metadata, Viewport } from "next";
 import { isPublicIndexingEnabled } from "@/lib/indexing";
 import "./globals.css";
+import "./studio.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { SiteFooter } from "@/components/SiteFooter";
 import { AnalyticsConsent } from "@/components/AnalyticsConsent";
 import { business } from "@/config/business";
+import localFont from "next/font/local";
+import { StudioGuide } from "@/components/StudioGuide";
+import { studioAIAvailable } from "@/lib/studio-ai";
+import { expandPriceTokens } from "@/lib/cms/format";
+import { StudioMotion } from "@/components/StudioMotion";
 import { getSiteUrl, toInternationalPhoneNumber } from "@/lib/site";
 
 const siteUrl = getSiteUrl();
+const headings = localFont({
+  src: "../node_modules/@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2",
+  variable: "--font-heading",
+  display: "swap",
+  weight: "100 900",
+});
+const bodyFont = localFont({
+  src: "../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
+  variable: "--font-body",
+  display: "swap",
+  weight: "100 900",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl ?? "http://localhost:3000"),
@@ -112,7 +130,7 @@ export default async function RootLayout({
     prices: settings.prices,
   };
   return (
-    <html lang="en">
+    <html lang="en" className={`${headings.variable} ${bodyFont.variable}`}>
       <body>
         <PublicSiteSettings
           settings={publicSettings}
@@ -128,8 +146,28 @@ export default async function RootLayout({
           </a>
           <SiteHeader />
           <main id="main-content">{children}</main>
+          <StudioMotion />
+          <noscript>
+            <style>{`.studio-guide{display:none!important}`}</style>
+          </noscript>
           <SiteFooter />
           <FloatingWhatsApp />
+          {state.available && (
+            <StudioGuide
+              aiEnabled={studioAIAvailable(true)}
+              answers={[
+                {
+                  question: "What can Growthly help me with?",
+                  answer:
+                    "Our core services are website development, graphic design and AI-assisted video adverts. Facebook/Instagram advertising and social media support can be scoped separately. Explore Services to choose the right starting point.",
+                },
+                ...settings.websiteFaqs.slice(0, 4).map((faq) => ({
+                  question: faq.question,
+                  answer: expandPriceTokens(faq.answer, settings),
+                })),
+              ]}
+            />
+          )}
           <AnalyticsConsent />
           <OrganizationSchema
             phone={state.available ? settings.whatsapp : undefined}

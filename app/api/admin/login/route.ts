@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
         { status: 401 },
       );
     }
-    if (data.user.app_metadata?.role !== "admin") {
+    if (!["admin", "creative_editor"].includes(data.user.app_metadata?.role)) {
       await supabase.auth.signOut();
       return privateJson(
         {
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         { status: 403 },
       );
     }
-    return privateJson({ ok: true });
+    return privateJson({ ok: true, redirect: data.user.app_metadata?.role === "creative_editor" ? "/creative" : "/admin" });
   } catch {
     return privateJson(
       { message: "Sign-in is temporarily unavailable. Try again later." },

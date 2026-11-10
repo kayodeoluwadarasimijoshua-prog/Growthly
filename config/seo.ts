@@ -4,8 +4,8 @@ import { websitePackages } from "@/config/business";
 export const seoPages = {
   home: {
     path: "/",
-    title: "Website Design & Development in Nigeria",
-    description: `Growthly builds professional business websites and online stores for Nigerian businesses. Website design ${websitePackages[0].price.toLowerCase()}. Get a Website Quote.`,
+    title: "Websites, Graphic Design & AI Adverts in Nigeria",
+    description: `Growthly creates websites, graphic design and AI adverts for Nigerian businesses. Websites ${websitePackages[0].price.toLowerCase()}. Explore our work and discuss your project.`,
     primaryKeyword: "website design in Nigeria",
     secondaryKeywords: [
       "website development in Nigeria",
@@ -14,7 +14,7 @@ export const seoPages = {
   },
   about: {
     path: "/about",
-    title: "About Growthly & Our Website-First Approach",
+    title: "About Growthly & Our Creative Team",
     description:
       "Meet Growthly’s business-focused approach to website development in Nigeria. Understand our process, responsibilities and separately scoped digital support.",
     primaryKeyword: "Growthly website development",
@@ -44,7 +44,7 @@ export const seoPages = {
   },
   portfolio: {
     path: "/portfolio",
-    title: "Website Projects & Case Studies",
+    title: "Website, Design & AI Advert Projects",
     description:
       "Explore Growthly’s StarXCO client website and AutoVault Motors dealership demo, with delivered scope, screenshots and design decisions.",
     primaryKeyword: "Growthly website projects",

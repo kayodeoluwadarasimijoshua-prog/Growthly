@@ -141,7 +141,7 @@ test("runtime contact links, three prices, metadata, quote choices and FAQ token
     "href",
     /wa\.me\/2348012345678/,
   );
-  await expect(page.locator(".faq-item").first()).toContainText("₦150,000");
+  await expect(page.locator(".faq-item").filter({ hasText: "How much does a business website cost?" })).toContainText("₦150,000");
   await page.goto(`${runtime}/pricing`);
   await expect(page.locator(".package-card")).toContainText([
     "₦150,000",

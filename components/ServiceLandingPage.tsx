@@ -1,6 +1,7 @@
 import { getSiteSettings, getPublishedProjects } from "@/lib/cms/public";
 import { expandPriceTokens } from "@/lib/cms/format";
 import { ProjectCard } from "@/components/ProjectCard";
+import { getPortfolioService, galleryPath } from "@/config/portfolio-services";
 import { sentenceServiceName } from "@/config/service-pages";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
@@ -113,6 +114,7 @@ export async function ServiceLandingPage({ slug }: { slug: string }) {
           </div>
         </section>
       )}
+      {getPortfolioService(slug) && <div className="container section-footer"><Link className="text-link" href={galleryPath(slug)}>Explore {page.label.toLowerCase()} projects <ArrowRight size={16} aria-hidden="true" /></Link></div>}
       <section className="section section--compact service-distinction">
         <div className="container">
           <div className="service-distinction__box">

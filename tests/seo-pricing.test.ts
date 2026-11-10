@@ -75,7 +75,7 @@ describe("approved pricing and focused SEO", () => {
     expect(robots().rules).toEqual({
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin", "/api/", "/review-media/"],
+      disallow: ["/admin", "/creative", "/auth/", "/api/", "/review-media/"],
     });
   });
   it("blocks preview indexing even when the production flag is inherited", () => {
@@ -95,5 +95,5 @@ it("lightweight client public identifiers stay aligned with the canonical real c
   expect([...publicProjectSlugs].sort()).toEqual(
     projects.map((p) => p.slug).sort(),
   );
-  expect(new Set(publicRoutePaths).size).toBe(20);
+  expect(new Set(publicRoutePaths).size).toBe(23);
 });

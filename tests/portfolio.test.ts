@@ -37,7 +37,7 @@ describe("owner-approved public work", () => {
   it("includes both approved project case studies", async () => {
     expect(
       (await sitemap())
-        .filter((p) => p.url.includes("/portfolio/"))
+        .filter((p) => p.url.includes("/portfolio/") && !p.url.includes("/portfolio/services/"))
         .map((p) => p.url),
     ).toEqual([
       "https://growthly.com.ng/portfolio/starxco",

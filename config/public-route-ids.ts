@@ -1,4 +1,5 @@
 import { getServicePath } from "@/config/service-pages";
+import { portfolioServices, galleryPath } from "@/config/portfolio-services";
 
 /** Lightweight public identifiers for client analytics, without importing content/image schemas. */
 export const publicServiceSlugs = [
@@ -14,6 +15,7 @@ export const publicRoutePaths = [
   "/",
   "/services",
   "/portfolio",
+  ...portfolioServices.map((service) => galleryPath(service.slug)),
   "/about",
   "/request-a-quote",
   "/contact",

@@ -29,6 +29,7 @@ export function AdminLoginForm({
       });
       const result = (await response.json().catch(() => null)) as {
         ok?: boolean;
+        redirect?: string;
         message?: string;
       } | null;
       if (!response.ok || result?.ok !== true) {
@@ -39,7 +40,7 @@ export function AdminLoginForm({
         setBusy(false);
         return;
       }
-      router.replace("/admin");
+      router.replace(result.redirect === "/creative" ? "/creative" : "/admin");
       router.refresh();
     } catch {
       setError("Sign-in is temporarily unavailable. Please try again.");
@@ -48,7 +49,7 @@ export function AdminLoginForm({
   }
 
   return (
-    <form className="admin-login__form" onSubmit={submit}>
+    <form className="admin-login__form" onSubmit={submit} method="post" action="/api/admin/login">
       {error ? (
         <div className="form-status form-status--error" role="alert">
           {error}

@@ -21,8 +21,8 @@ export default async function AboutPage() {
       <PageIntro
         label="About Growthly"
         path="/about"
-        eyebrow="Website-first. Business-focused."
-        title="Good websites begin with understanding your business."
+        eyebrow="The people behind the work"
+        title="A hands-on creative studio for your next step."
         description={settings.aboutIntro}
         aside={
           <>
@@ -48,10 +48,10 @@ export default async function AboutPage() {
               services you offer and how an interested customer can reach you.
             </p>
             <p>
-              We shape that online presence around your business. Website
-              development is our primary service, supported by graphic design,
-              AI-assisted video, social media and digital advertising when they
-              have a clear role in the brief.
+              We shape that online presence around your business. Our core work
+              combines website development, graphic design and AI-assisted video
+              adverts. Social media and advertising are available when they have
+              a clear role in your brief.
             </p>
             <p>
               You do not have to arrive with a technical specification. We help
@@ -59,8 +59,7 @@ export default async function AboutPage() {
               price and responsibilities before work begins.
             </p>
             <Link className="text-link mt-24" href="/services">
-              Explore our website & supporting services{" "}
-              <ArrowRight size={16} aria-hidden="true" />
+              Explore our services <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -119,6 +118,7 @@ export default async function AboutPage() {
       <section className="section section--compact">
         <div className="container">
           <ClosingCTA
+            chooseService
             title="Let’s give your business a website with a clear purpose."
             description="Share your business, your customers and what you want to make easier. We’ll discuss a practical direction and a written scope."
           />
