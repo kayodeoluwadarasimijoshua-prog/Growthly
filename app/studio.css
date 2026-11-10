@@ -702,6 +702,7 @@ p {
   padding: 30px;
 }
 .site-footer {
+  padding-bottom: max(104px, calc(env(safe-area-inset-bottom) + 88px));
   background: #0c3024;
   color: #e1ece5;
   border-top: 1px solid #244d3a;

@@ -122,3 +122,20 @@ test("reduced motion and no-JavaScript visits retain useful content", async ({
   ).toBeHidden();
   await nojs.close();
 });
+
+
+test("footer privacy links stay clear of floating contact controls", async ({ page }) => {
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await page.locator("footer").scrollIntoViewIfNeeded();
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    for (const link of await page.locator(".footer-bottom__links a").all()) {
+      expect(await link.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        const top = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
+        return top === element || element.contains(top);
+      })).toBe(true);
+    }
+  }
+});

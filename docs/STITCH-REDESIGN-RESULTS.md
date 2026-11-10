@@ -28,7 +28,7 @@ AI, invitations, public CMS, online enquiries and analytics remain independently
 - 17 isolated component browser checks: 16 owner-editor checks and the creative-to-owner private submission workflow, including AI suggestion review. These use synthetic identities and mocked providers, not live Supabase accounts or mail.
 - 105 public browser checks passed; the 25 private CMS/creative cases are intentionally gated in the public run and passed separately as the 17+8 checks above. Coverage includes service-specific journeys, enquiry privacy/failure modes, mobile/tablet/desktop layouts, accessible menus/forms, no-JavaScript content, reduced motion and automated accessibility scans.
 - SEO audit: 23 public pages, 23 unique titles, 23 unique descriptions, no audit errors and a working Open Graph image.
-- Final visual review identified the missing naira glyph in the Latin font subset; a licensed, self-hosted currency fallback was added. The small typography/arrow correction received a production rebuild and targeted visual/accessibility recheck after the full public suite.
+- Final visual review identified the missing naira glyph in the Latin font subset; a licensed, self-hosted currency fallback was added. The typography/arrow correction and extra footer clearance received a production rebuild and five targeted browser checks after the full public suite. The footer check verifies privacy links are not covered by floating contact controls on phones or desktops.
 
 Browser screenshots and machine-readable reports are local generated artifacts under `artifacts/stitch-redesign/`, excluded from Git.
 
